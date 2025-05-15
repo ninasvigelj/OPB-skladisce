@@ -1,4 +1,9 @@
-#uvoz podatkov z API-ji
+# https://pxweb.stat.si/SiStatData/pxweb/sl/Data/-/1906903S.px/table/tableViewLayout2/
+# https://pxweb.stat.si/SiStatData/pxweb/sl/Data/-/1418807S.px/table/tableViewLayout2/
+# https://pxweb.stat.si/SiStatData/pxweb/sl/Data/-/0309250S.px/table/tableViewLayout2/
+# https://pxweb.stat.si/SiStatData/pxweb/sl/Data/-/0723405S.px/table/tableViewLayout2/
+
+# uvoz podatkov z API-ji
 
 import psycopg2
 import pandas  as pd
@@ -8,6 +13,8 @@ import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
 import config
+
+
 
 
 database = config.database
