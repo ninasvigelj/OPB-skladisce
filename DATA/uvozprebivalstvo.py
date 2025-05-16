@@ -28,7 +28,8 @@ def ustvari_tabelo_delovnoaktivno(ime_tabele: str) -> None:
         CREATE TABLE IF NOT EXISTS {ime_tabele} (
             naselje TEXT,
             leto INTEGER,
-            stevilo INTEGER
+            stevilo INTEGER,
+            PRIMARY KEY (naselje, leto)
         );
     """)
     conn.commit()
@@ -60,8 +61,6 @@ def preberi_in_transformiraj_csv(ime_datoteke: str) -> pd.DataFrame:
     df_long["leto"] = df_long["leto"].astype(int)
     df_long["stevilo"] = df_long["stevilo"].astype(int)
 
-    print(df_long)
-
     return df_long
 
 
@@ -75,13 +74,16 @@ def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
     columns = df.columns.tolist()
     sql = f"INSERT INTO {ime_tabele} ({', '.join(columns)}) VALUES %s"
 
-    print(f"Vstavljam {len(records)} vrstic v tabelo {ime_tabele}...")
-    psycopg2.extras.execute_values(cur, sql, records)
-    print("Vstavljanje zaključeno.")
-    conn.commit()
+    try:
+        psycopg2.extras.execute_values(cur, sql, records)
+        conn.commit()
+        print("Vstavljanje zaključeno.")
+    except Exception as e:
+        print("Napaka pri vstavljanju v bazo:", e)
+        conn.rollback()
 
 
 if __name__ == "__main__":
-    df = preberi_in_transformiraj_csv("projekt\\DATA\\exceli\delovnoaktivno.csv")
+    df = preberi_in_transformiraj_csv("projekt\DATA\exceli\delovnoaktivno.csv")
     zapisi_df_v_bazo(df, "delovno_aktivno")
     print("CSV datoteka je bila uspešno zabeležena v bazi.")
