@@ -3,7 +3,7 @@
 # https://pxweb.stat.si/SiStatData/pxweb/sl/Data/-/0309250S.px/table/tableViewLayout2/
 # https://pxweb.stat.si/SiStatData/pxweb/sl/Data/-/0723405S.px/table/tableViewLayout2/
 
-# uvoz podatkov z API-ji
+#uvoz podatkov z API-ji
 
 import psycopg2
 import pandas  as pd
@@ -12,9 +12,7 @@ from re import sub
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
-import config
-
-
+import auth_public as config
 
 
 database = config.database
