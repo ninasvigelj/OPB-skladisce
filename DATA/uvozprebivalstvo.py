@@ -2,6 +2,7 @@ import psycopg2
 import pandas as pd
 from re import findall
 import psycopg2.extras
+import io
 
 import auth_public
 
@@ -18,62 +19,75 @@ conn = psycopg2.connect(
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-def ustvari_tabelo_delovnoprebiv(ime_tabele: str) -> None:
+def ustvari_tabelo_delovnoaktivno(ime_tabele: str) -> None:
     """
     Ustvari tabelo za podatke o delovno aktivnem prebivalstvu po občinah prebivališča.
     """
     cur.execute(f"""
         DROP TABLE IF EXISTS {ime_tabele};
         CREATE TABLE IF NOT EXISTS {ime_tabele} (
-            naselje TEXT,
+            prebivalisce TEXT,
             leto INTEGER,
             stevilo INTEGER,
-            PRIMARY KEY (naselje, leto)
+            PRIMARY KEY (prebivalisce, leto)
         );
     """)
+
     conn.commit()
 
 
 def preberi_in_transformiraj_csv(ime_datoteke: str) -> pd.DataFrame:
     """
-    Prebere CSV in ga preoblikuje v dolgo (long) obliko.
+    Prebere CSV z odvečnimi narekovaji in ga preoblikuje v dolgo (long) obliko.
     """
-    df = pd.read_csv(ime_datoteke, sep=";", encoding="cp1250")
+    # Preberi surove vrstice
+    with open(ime_datoteke, "r", encoding="cp1250") as f:
+        lines = f.readlines()
 
-    # Počistimo imena stolpcev
-    df.columns = [col.replace('"', '').strip() for col in df.columns]
-    df = df.rename(columns={df.columns[0]: "naselje", df.columns[1]: "spol"})
+    # Odstrani odvečne dvojne narekovaje in popravi vrstico
+    cleaned_lines = [line.replace('""', '"').replace('"', '') for line in lines]
+
+    # Združi v en CSV string
+    csv_content = "\n".join(cleaned_lines)
+
+    # Preberi CSV iz popravljene vsebine
+    df = pd.read_csv(io.StringIO(csv_content), sep=";")
+
+    # Poimenuj prva dva stolpca
+    df = df.rename(columns={df.columns[0]: "prebivalisce", df.columns[1]: "spol"})
 
     # Pretvori "-" v NaN
     df = df.replace("-", pd.NA)
 
-    # Pretvori v dolgo obliko
-    df_long = df.melt(id_vars=["naselje", "spol"], var_name="leto_raw", value_name="stevilo")
+    # V dolgo obliko
+    df_long = df.melt(id_vars=["prebivalisce", "spol"], var_name="leto_raw", value_name="stevilo")
 
-    # Iz 'leto_raw' izlušči leto kot število
+    # Izlušči leto
     df_long["leto"] = df_long["leto_raw"].apply(lambda x: int(findall(r"\d{4}", x)[0]) if findall(r"\d{4}", x) else None)
 
-    # Pretvori 'stevilo' v številko
+    # Pretvori v številke
     df_long["stevilo"] = pd.to_numeric(df_long["stevilo"], errors="coerce")
 
-    # Odstrani vrstice brez letnice ali števila
+    # Počisti neveljavne vrstice
     df_long = df_long.dropna(subset=["leto", "stevilo"])
+
+    # Popravi kodiranje znakov v 'prebivalisce'
+    df_long["prebivalisce"] = df_long["prebivalisce"].str.replace(r" \(prebivališče\)", "", regex=True)
+    df_long = df_long.rename(columns={"naselje": "prebivalisce"})
 
     # Pretvori tipe
     df_long["leto"] = df_long["leto"].astype(int)
     df_long["stevilo"] = df_long["stevilo"].astype(int)
+    
 
-    # Odstrani stolpec 'spol'
-    df_long = df_long.drop(columns=["spol", "leto_raw"])
-
-    return df_long
+    return df_long[["prebivalisce", "leto", "stevilo"]]
 
 
 def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
     """
     Zapiše podatke v bazo.
     """
-    ustvari_tabelo_delovnoprebiv(ime_tabele)
+    ustvari_tabelo_delovnoaktivno(ime_tabele)
 
     records = df.values.tolist()
     columns = df.columns.tolist()
@@ -89,6 +103,6 @@ def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
 
 
 if __name__ == "__main__":
-    df = preberi_in_transformiraj_csv("projekt/DATA/exceli/delovnoprebiv.csv")
+    df = preberi_in_transformiraj_csv("projekt\DATA\exceli\delovnoaktivno.csv")
     zapisi_df_v_bazo(df, "delovno_aktivno")
     print("CSV datoteka je bila uspešno zabeležena v bazi.")
