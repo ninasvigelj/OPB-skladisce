@@ -1,18 +1,18 @@
 import psycopg2
 import pandas  as pd
 from re import sub
-# uvozimo psycopg
+# uvozimo psycopg2
 import psycopg2, psycopg2.extensions, psycopg2.extras
-psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) 
 
-import auth_public as config
+import auth_public
 
 
-database = config.db
-host = config.host
-port = config.port
-user = config.user
-password = config.password
+database = auth_public.db
+host = auth_public.host
+port = auth_public.port
+user = auth_public.user
+password = auth_public.password
 
 # Ustvarimo povezavo
 conn = psycopg2.connect(database=database, host=host, port=port, user=user, password=password)
@@ -24,17 +24,15 @@ conn = psycopg2.connect(database=database, host=host, port=port, user=user, pass
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-def ustvari_tabelo_statregije(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi so vhodi in kakšen tip naj funkcija vrne
+def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi so vhodi in kakšen tip naj funkcija vrne
     """
-    Funkcija pobriše in na novo ustvari tabelo o podatkih BDP po statističnih regijah (na prebivalca v EUR).
+    Funkcija pobriše in na novo ustvari tabelo o podatkih strank.
     """
     cur.execute(f"""
         DROP table if exists {ime_tabele};
         CREATE table if not exists  {ime_tabele}(            
-            Regija text,
-            Leto integer,
-            BDP integer,
-            PRIMARY KEY (Regija, Leto)
+            obcina text primary key,
+            regija text
         );
     """)
     conn.commit()
@@ -43,94 +41,65 @@ def ustvari_tabelo_statregije(ime_tabele : str) -> None:   # da poveš pythonu k
 
 def preberi_csv(ime_datoteke : str) -> pd.DataFrame:
     df = pd.read_csv(ime_datoteke, 
-                     sep=",", 
-                     index_col=0)
+                     sep=";")
 
     return df
 
-# def preimenuj_stolpce_stranke(df: pd.DataFrame) -> pd.DataFrame:
-#     """
-#     Funkcija preimenuje stolpce v DataFrame-u, da ustrezajo camelCase konvenciji.
-#     """
-#     df = df.rename(columns={
-#             "Customer Id": "customer_id",
-#             "First Name": "first_name",
-#             "Last Name": "last_name",
-#             "Company": "company",
-#             "City": "city",
-#             "Country": "country",
-#             "Phone 1": "phone_1",
-#             "Phone 2": "phone_2",
-#             "Email": "email",
-#             "Subscription Date": "subscription_date",
-#             "Website": "website"
-#         }   # tukej mamo nek slovar v kaj se pretvorijo stolpci
-#     ) 
-#     return df
 
-# def transformiraj_stranke(df: pd.DataFrame) -> pd.DataFrame:
+def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
 
-#     # Pretvorba stolpca subscription_date v datum:
-#     df['subscription_date'] = pd.to_datetime(df['subscription_date'], errors='coerce')
-
-#     # Če je vrednost neveljaven datum, se pretvori v None; sicer pretvorimo v Python date objekt
-#     #df['subscription_date'] = df['subscription_date'].apply(lambda x: x.date() if pd.notnull(x) else None)
+    # Če je vrednost neveljaven datum, se pretvori v None; sicer pretvorimo v Python date objekt
+    #df['subscription_date'] = df['subscription_date'].apply(lambda x: x.date() if pd.notnull(x) else None)
     
-#     # Definiramo vrstni red stolpcev, kot so definirani v tabeli
-#     columns = [
-#         "customer_id", "first_name", "last_name", "company",
-#         "city", "country", "phone_1", "phone_2", "email",
-#         "subscription_date", "website"
-#     ]
+    # Definiramo vrstni red stolpcev, kot so definirani v tabeli
+    columns = [
+        "obcina", "regija"
+    ]
     
-#     # Poskrbimo, da DataFrame vsebuje točno te stolpce v pravem vrstnem redu
-#     df = df.reindex(columns=columns)
-#     return df
+    # Poskrbimo, da DataFrame vsebuje točno te stolpce v pravem vrstnem redu
+    df = df.reindex(columns=columns)
+    return df
 
 
-# def zapisi_df(df: pd.DataFrame) -> None:
+def zapisi_df(df: pd.DataFrame) -> None:
 
-#     ime_tabele = "customers"
+    ime_tabele = "obcine_po_regijah"
 
-#     # Poskrbimo, da tabela obstaja
-#     ustvari_tabelo_stranke(ime_tabele)
+    # Poskrbimo, da tabela obstaja
+    ustvari_tabelo(ime_tabele)
     
-#     # Če DataFrame nima stolpca 'Index', ga dodamo iz indeksa
-#     #df = df.reset_index()
+    # Če DataFrame nima stolpca 'Index', ga dodamo iz indeksa
+    #df = df.reset_index()
+    
+    # Transformiramo podatke v DataFrame-u
+    df = transformiraj(df)
+    
+    # shranimo stolpce v seznam
+    columns = df.columns.tolist()
 
-#     # Prvi korak: Stolpci v csvju so drugače poimenovani,
-#     # kot bi si jih želeli imeti v bazi.
-#     df = preimenuj_stolpce_stranke(df)
+    # Pretvorimo podatke v seznam tuple-ov
+    records = df.values.tolist()    #records je uvistvu seznam seznamov
     
-#     # Transformiramo podatke v DataFrame-u
-#     df = transformiraj_stranke(df)
+    # Pripravimo SQL ukaz za vstavljanje podatkov
+    sql = f"INSERT INTO {ime_tabele} ({', '.join(columns)}) VALUES %s"
     
-#     # shranimo stolpce v seznam
-#     columns = df.columns.tolist()
-
-#     # Pretvorimo podatke v seznam tuple-ov
-#     records = df.values.tolist()    #records je uvistvu seznam seznamov
+    # Uporabimo execute_values za množični vnos
+    # Izvede po en insert ukaz na vrstico oziroma record iz seznama records
+    # V odzadju zadeva deluje precej bolj optimlano kot en insert na ukaz!
+    # Za množičen vnos je potrebno uporabiti psycopg2.extras.execute_values
+    psycopg2.extras.execute_values(cur, sql, records)
     
-#     # Pripravimo SQL ukaz za vstavljanje podatkov
-#     sql = f"INSERT INTO {ime_tabele} ({', '.join(columns)}) VALUES %s"
-    
-#     # Uporabimo execute_values za množični vnos
-#     # Izvede po en insert ukaz na vrstico oziroma record iz seznama records
-#     # V odzadju zadeva deluje precej bolj optimlano kot en insert na ukaz!
-#     # Za množičen vnos je potrebno uporabiti psycopg2.extras.execute_values
-#     psycopg2.extras.execute_values(cur, sql, records)
-    
-#     # Potrdimo spremembe v bazi
-#     conn.commit()
+    # Potrdimo spremembe v bazi
+    conn.commit()
 
 
 
-# if __name__ == "__main__":
-#     # Preberi CSV datoteko, pri čemer privzamemo, da je datoteka
-#     # "customers-100.csv" v isti mapi kot tvoj skript ali podaj absolutno pot.
-#     df = preberi_csv("VajeKodaPrimer\customers-100.csv")
+if __name__ == "__main__":
+    # Preberi CSV datoteko, pri čemer privzamemo, da je datoteka
+    # "customers-100.csv" v isti mapi kot tvoj skript ali podaj absolutno pot.
+    df = preberi_csv("projekt\DATA\exceli\obcine_regije.csv")
     
-#     # Zapiši podatke iz DataFrame-a v tabelo "customers"
-#     zapisi_df(df)
+    # Zapiši podatke iz DataFrame-a v tabelo "customers"
+    zapisi_df(df)
     
-#     print("CSV datoteka je bila uspešno zabeležena v bazi.")
+    print("CSV datoteka je bila uspešno zabeležena v bazi.")
