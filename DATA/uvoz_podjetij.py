@@ -15,7 +15,8 @@ user = auth_public.user
 password = auth_public.password
 
 # Ustvarimo povezavo
-conn = psycopg2.connect(database=database, host=host, port=port, user=user, password=password)
+conn = psycopg2.connect(database=database, host=host, 
+                        port=port, user=user, password=password)
 
 
 # Iz povezave naredimo cursor, ki omogoča
@@ -32,7 +33,22 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
         DROP table if exists {ime_tabele};
         CREATE table if not exists  {ime_tabele}(            
             obcina text primary key,
-            regija text
+            leto_2008 text,
+            leto_2009 text,
+            leto_2010 text,
+            leto_2011 text,
+            leto_2012 text,
+            leto_2013 text,
+            leto_2014 text,
+            leto_2015 text,
+            leto_2016 text,
+            leto_2017 text,
+            leto_2018 text,
+            leto_2019 text,
+            leto_2020 text,
+            leto_2021 text,
+            leto_2022 text,
+            leto_2023 text
         );
     """)
     conn.commit()
@@ -41,8 +57,9 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
 
 def preberi_csv(ime_datoteke : str) -> pd.DataFrame:
     df = pd.read_csv(ime_datoteke, 
-                     sep=";")
-
+                    sep=";",
+                    encoding='utf-8',
+                    skiprows=2)
     return df
 
 
@@ -52,25 +69,49 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     #df['subscription_date'] = df['subscription_date'].apply(lambda x: x.date() if pd.notnull(x) else None)
     
     # Definiramo vrstni red stolpcev, kot so definirani v tabeli
-    columns = [
-        "obcina", "regija"
-    ]
+    columns = ["obcina"] + [f'leto_{leto}' for leto in range(2008, 2023)]
     
     # Poskrbimo, da DataFrame vsebuje točno te stolpce v pravem vrstnem redu
     df = df.reindex(columns=columns)
     return df
 
+def preimenuj_stolpce(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Funkcija preimenuje stolpce v DataFrame-u, da ustrezajo camelCase konvenciji.
+    """
+    df = df.rename(columns={
+            "OB�INE":"obcina",
+            "2008 �tevilo podjetij":"leto_2008",
+            "2009 �tevilo podjetij":"leto_2009",
+            "2010 �tevilo podjetij":"leto_2010",
+            "2011 �tevilo podjetij":"leto_2011",
+            "2012 �tevilo podjetij":"leto_2012",
+            "2013 �tevilo podjetij":"leto_2013",
+            "2014 �tevilo podjetij":"leto_2014",
+            "2015 �tevilo podjetij":"leto_2015",
+            "2016 �tevilo podjetij":"leto_2016",
+            "2017 �tevilo podjetij":"leto_2017",
+            "2018 �tevilo podjetij":"leto_2018",
+            "2019 �tevilo podjetij":"leto_2019",
+            "2020 �tevilo podjetij":"leto_2020",
+            "2021 �tevilo podjetij":"leto_2021",
+            "2022 �tevilo podjetij":"leto_2022",
+            "2023 �tevilo podjetij":"leto_2023"
+        }  
+    ) 
+    return df
 
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "obcine_po_regijah"
+    ime_tabele = "st_podjetij"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
     
     # Če DataFrame nima stolpca 'Index', ga dodamo iz indeksa
     #df = df.reset_index()
-    
+    df = preimenuj_stolpce(df)
+
     # Transformiramo podatke v DataFrame-u
     df = transformiraj(df)
     
@@ -78,7 +119,7 @@ def zapisi_df(df: pd.DataFrame) -> None:
     columns = df.columns.tolist()
 
     # Pretvorimo podatke v seznam tuple-ov
-    records = df.values.tolist()    
+    records = df.values.tolist()    #records je uvistvu seznam seznamov
     
     # Pripravimo SQL ukaz za vstavljanje podatkov
     sql = f"INSERT INTO {ime_tabele} ({', '.join(columns)}) VALUES %s"
@@ -94,7 +135,9 @@ def zapisi_df(df: pd.DataFrame) -> None:
 
 
 
+
 if __name__ == "__main__":
-    df = preberi_csv("projekt\DATA\exceli\obcine_regije.csv")
+    df = preberi_csv("projekt\DATA\exceli\stpodjetij.csv")
     zapisi_df(df)
+    
     print("CSV datoteka je bila uspešno zabeležena v bazi.")
