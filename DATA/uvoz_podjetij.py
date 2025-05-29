@@ -86,6 +86,10 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     stolpci = ["obcina"] + [f'leto_{leto}' for leto in range(2008, 2024)]
     df = df[stolpci]
 
+    # Spremenimo Kanal v Kanal ob Soči
+    df.loc[:, "obcina"] = df["obcina"].str.replace("Kanal", "Kanal ob Soči", regex=True)
+
+
     # Pretvorimo v dolgo obliko
     df_long = df.melt(id_vars="obcina", var_name="leto", value_name="stevilo")
 
