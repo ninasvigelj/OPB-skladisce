@@ -1,87 +1,144 @@
 import psycopg2
-import pandas as pd
-from re import findall
-import psycopg2.extras
-import io
+import pandas  as pd
+from re import sub
+# uvozimo psycopg2
+import psycopg2, psycopg2.extensions, psycopg2.extras
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) 
 
 import auth_public
 
-psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
-# Povezava do baze
-conn = psycopg2.connect(
-    database=auth_public.db,
-    host=auth_public.host,
-    port=auth_public.port,
-    user=auth_public.user,
-    password=auth_public.password
-)
+database = auth_public.db
+host = auth_public.host
+port = auth_public.port
+user = auth_public.user
+password = auth_public.password
+
+# Ustvarimo povezavo
+conn = psycopg2.connect(database=database, host=host, 
+                        port=port, user=user, password=password)
+
+
+# Iz povezave naredimo cursor, ki omogoča
+# zaganjanje ukazov na bazi
+
 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 
-def ustvari_tabelo_delovnoaktivno(ime_tabele: str) -> None:
+def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi so vhodi in kakšen tip naj funkcija vrne
     """
-    Ustvari tabelo za podatke o delovno aktivnem prebivalstvu po občinah prebivališča.
+    Funkcija pobriše in na novo ustvari tabelo o podatkih strank.
     """
     cur.execute(f"""
-        DROP TABLE IF EXISTS {ime_tabele};
-        CREATE TABLE IF NOT EXISTS {ime_tabele} (
-            prebivalisce TEXT,
-            leto INTEGER,
-            stevilo INTEGER,
-            regija TEXT,
-            PRIMARY KEY (prebivalisce, leto)
+        DROP table if exists {ime_tabele};
+        CREATE table if not exists  {ime_tabele}(            
+            obcina text,
+            leto integer,
+            stevilo integer,
+            regija text,
+            PRIMARY KEY (obcina, leto)
         );
     """)
-
     conn.commit()
 
+# drop mamo samo zato, da lahko še enkrat poženemo
 
-def preberi_in_transformiraj_csv(ime_datoteke: str) -> pd.DataFrame:
+def preberi_csv(ime_datoteke : str) -> pd.DataFrame:
+    df = pd.read_csv(ime_datoteke, 
+                    sep=";",
+                    encoding='windows-1250')
+    return df
+
+
+import pandas as pd
+
+def preimenuj_stolpce(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Prebere CSV z odvečnimi narekovaji in ga preoblikuje v dolgo (long) obliko.
+    Preimenuje originalne stolpce v standardizirano obliko za nadaljnjo obdelavo.
     """
-    # Preberi surove vrstice
-    with open(ime_datoteke, "r", encoding="cp1250") as f:
-        lines = f.readlines()
+    stolpci = {
+        "OBČINA PREBIVALIŠČA": "obcina",
+        "SPOL": "spol",
+        "2008": "leto_2008",
+        "2009": "leto_2009",
+        "2010": "leto_2010",
+        "2011": "leto_2011",
+        "2012": "leto_2012",
+        "2013": "leto_2013",
+        "2014": "leto_2014",
+        "2015": "leto_2015",
+        "2016": "leto_2016",
+        "2017": "leto_2017",
+        "2018": "leto_2018",
+        "2019": "leto_2019",
+        "2020": "leto_2020",
+        "2021": "leto_2021",
+        "2022": "leto_2022",
+        "2023": "leto_2023"
+    }
+    return df.rename(columns=stolpci)
 
-    # Odstrani odvečne dvojne narekovaje in popravi vrstico
-    cleaned_lines = [line.replace('""', '"').replace('"', '') for line in lines]
+def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Pretvori široko tabelo v dolgo obliko z ustreznimi stolpci:
+    obcina | leto | stevilo
+    """
+    # Omejimo se na ustrezne stolpce
+    stolpci = ["obcina"] + [f'leto_{leto}' for leto in range(2008, 2024)]
+    df = df[stolpci]
 
-    # Združi v en CSV string
-    csv_content = "\n".join(cleaned_lines)
+    df.loc[:, "obcina"] = df["obcina"].str.replace(r"\s*\(prebivališče\)", "", regex=True)
 
-    # Preberi CSV iz popravljene vsebine
-    df = pd.read_csv(io.StringIO(csv_content), sep=";")
+    # Pretvorimo v dolgo obliko
+    df_long = df.melt(id_vars="obcina", var_name="leto", value_name="stevilo")
 
-    # Poimenuj prva dva stolpca
-    df = df.rename(columns={df.columns[0]: "prebivalisce", df.columns[1]: "spol"})
+    # Odstranimo vrstice s simbolom '-' ali manjkajočimi vrednostmi
+    df_long = df_long[df_long["stevilo"] != "-"]
+    df_long = df_long.dropna(subset=["stevilo"])
 
-    # Pretvori "-" v NaN
-    df = df.replace("-", pd.NA)
+    # Pretvorimo 'leto' iz npr. 'leto_2008' v število 2008
+    df_long["leto"] = df_long["leto"].str.extract(r'(\d{4})').astype(int)
 
-    # V dolgo obliko
-    df_long = df.melt(id_vars=["prebivalisce", "spol"], var_name="leto_raw", value_name="stevilo")
-
-    # Izlušči leto
-    df_long["leto"] = df_long["leto_raw"].apply(lambda x: int(findall(r"\d{4}", x)[0]) if findall(r"\d{4}", x) else None)
-
-    # Pretvori v številke
-    df_long["stevilo"] = pd.to_numeric(df_long["stevilo"], errors="coerce")
-
-    # Počisti neveljavne vrstice
-    df_long = df_long.dropna(subset=["leto", "stevilo"])
-
-    # Popravi kodiranje znakov v 'prebivalisce'
-    df_long["prebivalisce"] = df_long["prebivalisce"].str.replace(r" \(prebivališče\)", "", regex=True)
-    df_long = df_long.rename(columns={"naselje": "prebivalisce"})
-
-    # Pretvori tipe
-    df_long["leto"] = df_long["leto"].astype(int)
+    # Pretvorimo stolpec 'stevilo' v integer, če je možno
     df_long["stevilo"] = df_long["stevilo"].astype(int)
-    
 
-    return df_long[["prebivalisce", "leto", "stevilo"]]
+    return df_long
+
+
+def zapisi_df(df: pd.DataFrame) -> None:
+
+    ime_tabele = "delovno_aktivno"
+
+    # Poskrbimo, da tabela obstaja
+    ustvari_tabelo(ime_tabele)
+    
+    # Če DataFrame nima stolpca 'Index', ga dodamo iz indeksa
+    #df = df.reset_index()
+    df = preimenuj_stolpce(df)
+
+    # Transformiramo podatke v DataFrame-u
+    df = transformiraj(df)
+
+    # Dodamo pripadajoče regije
+    df = dodaj_regije(df)
+    
+    # shranimo stolpce v seznam
+    columns = df.columns.tolist()
+
+    # Pretvorimo podatke v seznam tuple-ov
+    records = df.values.tolist()    #records je uvistvu seznam seznamov
+    
+    # Pripravimo SQL ukaz za vstavljanje podatkov
+    sql = f"INSERT INTO {ime_tabele} ({', '.join(columns)}) VALUES %s"
+    
+    # Uporabimo execute_values za množični vnos
+    # Izvede po en insert ukaz na vrstico oziroma record iz seznama records
+    # V odzadju zadeva deluje precej bolj optimlano kot en insert na ukaz!
+    # Za množičen vnos je potrebno uporabiti psycopg2.extras.execute_values
+    psycopg2.extras.execute_values(cur, sql, records)
+    
+    # Potrdimo spremembe v bazi
+    conn.commit()
 
 def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -116,35 +173,14 @@ def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
         return "-"
 
     # Uporabi funkcijo na stolpec
-    df["regija"] = df["prebivalisce"].apply(najdi_regijo)
+    df["regija"] = df["obcina"].apply(najdi_regijo)
 
     return df
 
 
-
-def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
-    """
-    Zapiše podatke v bazo.
-    """
-    ustvari_tabelo_delovnoaktivno(ime_tabele)
-
-    records = df.values.tolist()
-    columns = df.columns.tolist()
-    sql = f"INSERT INTO {ime_tabele} ({', '.join(columns)}) VALUES %s"
-
-    try:
-        psycopg2.extras.execute_values(cur, sql, records)
-        conn.commit()
-        print("Vstavljanje zaključeno.")
-    except Exception as e:
-        print("Napaka pri vstavljanju v bazo:", e)
-        conn.rollback()
-
-
 if __name__ == "__main__":
-    df = preberi_in_transformiraj_csv("projekt\DATA\csv_datoteke\delovnoaktivno.csv")
+    df = preberi_csv("projekt\DATA\csv_datoteke\delovnoaktivno.csv")
+
+    zapisi_df(df)
     
-    # dodamo regije
-    df = dodaj_regije(df)
-    zapisi_df_v_bazo(df, "delovno_aktivno")
     print("CSV datoteka je bila uspešno zabeležena v bazi.")

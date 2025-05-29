@@ -32,23 +32,11 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
     cur.execute(f"""
         DROP table if exists {ime_tabele};
         CREATE table if not exists  {ime_tabele}(            
-            obcina text primary key,
-            leto_2008 text,
-            leto_2009 text,
-            leto_2010 text,
-            leto_2011 text,
-            leto_2012 text,
-            leto_2013 text,
-            leto_2014 text,
-            leto_2015 text,
-            leto_2016 text,
-            leto_2017 text,
-            leto_2018 text,
-            leto_2019 text,
-            leto_2020 text,
-            leto_2021 text,
-            leto_2022 text,
-            leto_2023 text
+            obcina text,
+            leto integer,
+            stevilo integer,
+            regija text,
+            PRIMARY KEY (obcina, leto)
         );
     """)
     conn.commit()
@@ -62,43 +50,57 @@ def preberi_csv(ime_datoteke : str) -> pd.DataFrame:
     return df
 
 
-def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
-
-    # Če je vrednost neveljaven datum, se pretvori v None; sicer pretvorimo v Python date objekt
-    #df['subscription_date'] = df['subscription_date'].apply(lambda x: x.date() if pd.notnull(x) else None)
-    
-    # Definiramo vrstni red stolpcev, kot so definirani v tabeli
-    columns = ["obcina"] + [f'leto_{leto}' for leto in range(2008, 2023)]
-    
-    # Poskrbimo, da DataFrame vsebuje točno te stolpce v pravem vrstnem redu
-    df = df.reindex(columns=columns)
-    return df
+import pandas as pd
 
 def preimenuj_stolpce(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Funkcija preimenuje stolpce v DataFrame-u, da ustrezajo camelCase konvenciji.
+    Preimenuje originalne stolpce v standardizirano obliko za nadaljnjo obdelavo.
     """
-    df = df.rename(columns={
-            "OBČINE":"obcina",
-            "2008 Število podjetij":"leto_2008",
-            "2009 Število podjetij":"leto_2009",
-            "2010 Število podjetij":"leto_2010",
-            "2011 Število podjetij":"leto_2011",
-            "2012 Število podjetij":"leto_2012",
-            "2013 Število podjetij":"leto_2013",
-            "2014 Število podjetij":"leto_2014",
-            "2015 Število podjetij":"leto_2015",
-            "2016 Število podjetij":"leto_2016",
-            "2017 Število podjetij":"leto_2017",
-            "2018 Število podjetij":"leto_2018",
-            "2019 Število podjetij":"leto_2019",
-            "2020 Število podjetij":"leto_2020",
-            "2021 Število podjetij":"leto_2021",
-            "2022 Število podjetij":"leto_2022",
-            "2023 Število podjetij":"leto_2023"
-        }  
-    ) 
-    return df
+    stolpci = {
+        "OBČINE": "obcina",
+        "2008 Število podjetij": "leto_2008",
+        "2009 Število podjetij": "leto_2009",
+        "2010 Število podjetij": "leto_2010",
+        "2011 Število podjetij": "leto_2011",
+        "2012 Število podjetij": "leto_2012",
+        "2013 Število podjetij": "leto_2013",
+        "2014 Število podjetij": "leto_2014",
+        "2015 Število podjetij": "leto_2015",
+        "2016 Število podjetij": "leto_2016",
+        "2017 Število podjetij": "leto_2017",
+        "2018 Število podjetij": "leto_2018",
+        "2019 Število podjetij": "leto_2019",
+        "2020 Število podjetij": "leto_2020",
+        "2021 Število podjetij": "leto_2021",
+        "2022 Število podjetij": "leto_2022",
+        "2023 Število podjetij": "leto_2023"
+    }
+    return df.rename(columns=stolpci)
+
+def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Pretvori široko tabelo v dolgo obliko z ustreznimi stolpci:
+    obcina | leto | stevilo
+    """
+    # Omejimo se na ustrezne stolpce
+    stolpci = ["obcina"] + [f'leto_{leto}' for leto in range(2008, 2024)]
+    df = df[stolpci]
+
+    # Pretvorimo v dolgo obliko
+    df_long = df.melt(id_vars="obcina", var_name="leto", value_name="stevilo")
+
+    # Odstranimo vrstice s simbolom '-' ali manjkajočimi vrednostmi
+    df_long = df_long[df_long["stevilo"] != "-"]
+    df_long = df_long.dropna(subset=["stevilo"])
+
+    # Pretvorimo 'leto' iz npr. 'leto_2008' v število 2008
+    df_long["leto"] = df_long["leto"].str.extract(r'(\d{4})').astype(int)
+
+    # Pretvorimo stolpec 'stevilo' v integer, če je možno
+    df_long["stevilo"] = df_long["stevilo"].astype(int)
+
+    return df_long
+
 
 def zapisi_df(df: pd.DataFrame) -> None:
 
@@ -113,6 +115,9 @@ def zapisi_df(df: pd.DataFrame) -> None:
 
     # Transformiramo podatke v DataFrame-u
     df = transformiraj(df)
+
+    # Dodamo pripadajoče regije
+    df = dodaj_regije(df)
     
     # shranimo stolpce v seznam
     columns = df.columns.tolist()
@@ -132,11 +137,47 @@ def zapisi_df(df: pd.DataFrame) -> None:
     # Potrdimo spremembe v bazi
     conn.commit()
 
+def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Če obstaja tabela obcine_po_regijah, doda stolpec 'regija' glede na 'prebivalisce'.
+    Pri tem upošteva tudi dvojezična imena občin (npr. 'Izola/Isola').
+    """
+    # Preveri obstoj tabele
+    cur.execute("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_name = 'obcine_po_regijah'
+        );
+    """)
+    obstaja = cur.fetchone()[0]
 
+    if not obstaja:
+        print("Tabela 'obcine_po_regijah' ne obstaja. Dodajam stolpec 'regija' z vrednostjo '-'.")
+        df["regija"] = "-"
+        return df
+
+    # Preberi občine in regije v slovar
+    cur.execute("SELECT obcina, regija FROM obcine_po_regijah;")
+    rezultati = cur.fetchall()
+    obcine_dict = {r["obcina"]: r["regija"] for r in rezultati}
+
+    # Funkcija za iskanje regije, tudi za dvojezična imena
+    def najdi_regijo(prebivalisce: str) -> str:
+        kandidati = [ime.strip() for ime in prebivalisce.split("/")]
+        for kandidat in kandidati:
+            if kandidat in obcine_dict:
+                return obcine_dict[kandidat]
+        return "-"
+
+    # Uporabi funkcijo na stolpec
+    df["regija"] = df["obcina"].apply(najdi_regijo)
+
+    return df
 
 
 if __name__ == "__main__":
     df = preberi_csv("projekt\DATA\csv_datoteke\stpodjetij.csv")
+
     zapisi_df(df)
     
     print("CSV datoteka je bila uspešno zabeležena v bazi.")
