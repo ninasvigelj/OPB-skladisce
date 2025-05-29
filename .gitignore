@@ -1,2 +1,5 @@
 venv/
 OPB/
+
+*.pyc
+__pycache__/
