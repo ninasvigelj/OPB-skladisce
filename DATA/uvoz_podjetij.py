@@ -157,7 +157,7 @@ def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
 
     if not obstaja:
         print("Tabela 'obcine_po_regijah' ne obstaja. Dodajam stolpec 'regija' z vrednostjo '-'.")
-        df["regija"] = "-"
+        df["regija"] = None
         return df
 
     # Preberi občine in regije v slovar
