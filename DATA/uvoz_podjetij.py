@@ -57,24 +57,23 @@ def preimenuj_stolpce(df: pd.DataFrame) -> pd.DataFrame:
     Preimenuje originalne stolpce v standardizirano obliko za nadaljnjo obdelavo.
     """
     stolpci = {
-        "OBČINA PREBIVALIŠČA": "obcina",
-        "SPOL": "spol",
-        "2008": "leto_2008",
-        "2009": "leto_2009",
-        "2010": "leto_2010",
-        "2011": "leto_2011",
-        "2012": "leto_2012",
-        "2013": "leto_2013",
-        "2014": "leto_2014",
-        "2015": "leto_2015",
-        "2016": "leto_2016",
-        "2017": "leto_2017",
-        "2018": "leto_2018",
-        "2019": "leto_2019",
-        "2020": "leto_2020",
-        "2021": "leto_2021",
-        "2022": "leto_2022",
-        "2023": "leto_2023"
+        "OBČINE": "obcina",
+        "2008 Število podjetij": "leto_2008",
+        "2009 Število podjetij": "leto_2009",
+        "2010 Število podjetij": "leto_2010",
+        "2011 Število podjetij": "leto_2011",
+        "2012 Število podjetij": "leto_2012",
+        "2013 Število podjetij": "leto_2013",
+        "2014 Število podjetij": "leto_2014",
+        "2015 Število podjetij": "leto_2015",
+        "2016 Število podjetij": "leto_2016",
+        "2017 Število podjetij": "leto_2017",
+        "2018 Število podjetij": "leto_2018",
+        "2019 Število podjetij": "leto_2019",
+        "2020 Število podjetij": "leto_2020",
+        "2021 Število podjetij": "leto_2021",
+        "2022 Število podjetij": "leto_2022",
+        "2023 Število podjetij": "leto_2023"
     }
     return df.rename(columns=stolpci)
 
@@ -87,7 +86,9 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     stolpci = ["obcina"] + [f'leto_{leto}' for leto in range(2008, 2024)]
     df = df[stolpci]
 
-    df.loc[:, "obcina"] = df["obcina"].str.replace(r"\s*\(prebivališče\)", "", regex=True)
+    # Spremenimo Kanal v Kanal ob Soči
+    df.loc[:, "obcina"] = df["obcina"].str.replace("Kanal", "Kanal ob Soči", regex=True)
+
 
     # Pretvorimo v dolgo obliko
     df_long = df.melt(id_vars="obcina", var_name="leto", value_name="stevilo")
@@ -107,7 +108,7 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
 
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "delovno_aktivno"
+    ime_tabele = "st_podjetij"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
@@ -156,7 +157,7 @@ def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
 
     if not obstaja:
         print("Tabela 'obcine_po_regijah' ne obstaja. Dodajam stolpec 'regija' z vrednostjo '-'.")
-        df["regija"] = "-"
+        df["regija"] = None
         return df
 
     # Preberi občine in regije v slovar
@@ -179,7 +180,7 @@ def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    df = preberi_csv("projekt\DATA\csv_datoteke\delovnoaktivno.csv")
+    df = preberi_csv("projekt\DATA\csv_datoteke\stpodjetij.csv")
 
     zapisi_df(df)
     
