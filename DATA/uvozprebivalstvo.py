@@ -29,6 +29,7 @@ def ustvari_tabelo_delovnoaktivno(ime_tabele: str) -> None:
             prebivalisce TEXT,
             leto INTEGER,
             stevilo INTEGER,
+            regija TEXT,
             PRIMARY KEY (prebivalisce, leto)
         );
     """)
@@ -82,6 +83,44 @@ def preberi_in_transformiraj_csv(ime_datoteke: str) -> pd.DataFrame:
 
     return df_long[["prebivalisce", "leto", "stevilo"]]
 
+def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Če obstaja tabela obcine_po_regijah, doda stolpec 'regija' glede na 'prebivalisce'.
+    Pri tem upošteva tudi dvojezična imena občin (npr. 'Izola/Isola').
+    """
+    # Preveri obstoj tabele
+    cur.execute("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_name = 'obcine_po_regijah'
+        );
+    """)
+    obstaja = cur.fetchone()[0]
+
+    if not obstaja:
+        print("Tabela 'obcine_po_regijah' ne obstaja. Dodajam stolpec 'regija' z vrednostjo '-'.")
+        df["regija"] = "-"
+        return df
+
+    # Preberi občine in regije v slovar
+    cur.execute("SELECT obcina, regija FROM obcine_po_regijah;")
+    rezultati = cur.fetchall()
+    obcine_dict = {r["obcina"]: r["regija"] for r in rezultati}
+
+    # Funkcija za iskanje regije, tudi za dvojezična imena
+    def najdi_regijo(prebivalisce: str) -> str:
+        kandidati = [ime.strip() for ime in prebivalisce.split("/")]
+        for kandidat in kandidati:
+            if kandidat in obcine_dict:
+                return obcine_dict[kandidat]
+        return "-"
+
+    # Uporabi funkcijo na stolpec
+    df["regija"] = df["prebivalisce"].apply(najdi_regijo)
+
+    return df
+
+
 
 def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
     """
@@ -104,5 +143,8 @@ def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
 
 if __name__ == "__main__":
     df = preberi_in_transformiraj_csv("projekt\DATA\exceli\delovnoaktivno.csv")
+    
+    # dodamo regije
+    df = dodaj_regije(df)
     zapisi_df_v_bazo(df, "delovno_aktivno")
     print("CSV datoteka je bila uspešno zabeležena v bazi.")
