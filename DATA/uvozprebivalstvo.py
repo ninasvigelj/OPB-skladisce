@@ -142,7 +142,7 @@ def zapisi_df_v_bazo(df: pd.DataFrame, ime_tabele: str) -> None:
 
 
 if __name__ == "__main__":
-    df = preberi_in_transformiraj_csv("projekt\DATA\exceli\delovnoaktivno.csv")
+    df = preberi_in_transformiraj_csv("projekt\DATA\csv_datoteke\delovnoaktivno.csv")
     
     # dodamo regije
     df = dodaj_regije(df)

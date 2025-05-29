@@ -95,6 +95,6 @@ def zapisi_df(df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    df = preberi_csv("projekt\DATA\exceli\obcine_regije.csv")
+    df = preberi_csv("projekt\DATA\csv_datoteke\obcine_regije.csv")
     zapisi_df(df)
     print("CSV datoteka je bila uspešno zabeležena v bazi.")

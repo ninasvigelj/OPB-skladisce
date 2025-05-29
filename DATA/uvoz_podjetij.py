@@ -58,8 +58,7 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
 def preberi_csv(ime_datoteke : str) -> pd.DataFrame:
     df = pd.read_csv(ime_datoteke, 
                     sep=";",
-                    encoding='utf-8',
-                    skiprows=2)
+                    encoding='windows-1250')
     return df
 
 
@@ -80,23 +79,23 @@ def preimenuj_stolpce(df: pd.DataFrame) -> pd.DataFrame:
     Funkcija preimenuje stolpce v DataFrame-u, da ustrezajo camelCase konvenciji.
     """
     df = df.rename(columns={
-            "OB�INE":"obcina",
-            "2008 �tevilo podjetij":"leto_2008",
-            "2009 �tevilo podjetij":"leto_2009",
-            "2010 �tevilo podjetij":"leto_2010",
-            "2011 �tevilo podjetij":"leto_2011",
-            "2012 �tevilo podjetij":"leto_2012",
-            "2013 �tevilo podjetij":"leto_2013",
-            "2014 �tevilo podjetij":"leto_2014",
-            "2015 �tevilo podjetij":"leto_2015",
-            "2016 �tevilo podjetij":"leto_2016",
-            "2017 �tevilo podjetij":"leto_2017",
-            "2018 �tevilo podjetij":"leto_2018",
-            "2019 �tevilo podjetij":"leto_2019",
-            "2020 �tevilo podjetij":"leto_2020",
-            "2021 �tevilo podjetij":"leto_2021",
-            "2022 �tevilo podjetij":"leto_2022",
-            "2023 �tevilo podjetij":"leto_2023"
+            "OBČINE":"obcina",
+            "2008 Število podjetij":"leto_2008",
+            "2009 Število podjetij":"leto_2009",
+            "2010 Število podjetij":"leto_2010",
+            "2011 Število podjetij":"leto_2011",
+            "2012 Število podjetij":"leto_2012",
+            "2013 Število podjetij":"leto_2013",
+            "2014 Število podjetij":"leto_2014",
+            "2015 Število podjetij":"leto_2015",
+            "2016 Število podjetij":"leto_2016",
+            "2017 Število podjetij":"leto_2017",
+            "2018 Število podjetij":"leto_2018",
+            "2019 Število podjetij":"leto_2019",
+            "2020 Število podjetij":"leto_2020",
+            "2021 Število podjetij":"leto_2021",
+            "2022 Število podjetij":"leto_2022",
+            "2023 Število podjetij":"leto_2023"
         }  
     ) 
     return df
@@ -137,7 +136,7 @@ def zapisi_df(df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    df = preberi_csv("projekt\DATA\exceli\stpodjetij.csv")
+    df = preberi_csv("projekt\DATA\csv_datoteke\stpodjetij.csv")
     zapisi_df(df)
     
     print("CSV datoteka je bila uspešno zabeležena v bazi.")
