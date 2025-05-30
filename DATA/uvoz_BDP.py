@@ -53,7 +53,6 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=['MERITVE'])
     col = ["STATISTIČNA REGIJA"] + [f"{leto}" for leto in range(2008, 2024)]
     
-    print("Obstoječi stolpci v df:", df.columns.tolist())
     df = df[col]
     df = df.rename(columns={'STATISTIČNA REGIJA': 'regija'})
 
