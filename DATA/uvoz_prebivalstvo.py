@@ -32,11 +32,10 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
     cur.execute(f"""
         DROP table if exists {ime_tabele};
         CREATE table if not exists  {ime_tabele}(            
-            obcina text,
+            obcina_id integer,
             leto integer,
             stevilo integer,
-            regija text,
-            PRIMARY KEY (obcina, leto)
+            PRIMARY KEY (obcina_id, leto)
         );
     """)
     conn.commit()
@@ -89,8 +88,17 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
 
     df.loc[:, "obcina"] = df["obcina"].str.replace(r"\s*\(prebivališče\)", "", regex=True)
 
+    # Spremenimo Kanal v Kanal ob Soči
+    df.loc[:, "obcina"] = df["obcina"].str.replace("Kanal", "Kanal ob Soči", regex=True)
+
     # Pretvorimo v dolgo obliko
     df_long = df.melt(id_vars="obcina", var_name="leto", value_name="stevilo")
+
+    # odstranimo Slovenijo, ker ni zares občina
+    df_long = df_long[df_long["obcina"] != "SLOVENIJA"]
+
+    # odstranimo neznano občino prebivališča
+    df_long = df_long[df_long["obcina"] != "Neznana občina prebivališča"]
 
     # Odstranimo vrstice s simbolom '-' ali manjkajočimi vrednostmi
     df_long = df_long[df_long["stevilo"] != "-"]
@@ -107,7 +115,7 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
 
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "delovno_aktivno"
+    ime_tabele = "fact_delovno_aktivno"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
@@ -120,7 +128,10 @@ def zapisi_df(df: pd.DataFrame) -> None:
     df = transformiraj(df)
 
     # Dodamo pripadajoče regije
-    df = dodaj_regije(df)
+    df = dodaj_obcina_id(df)
+
+    if "obcina" in df.columns:
+        df = df.drop(columns=["obcina"])
     
     # shranimo stolpce v seznam
     columns = df.columns.tolist()
@@ -140,40 +151,37 @@ def zapisi_df(df: pd.DataFrame) -> None:
     # Potrdimo spremembe v bazi
     conn.commit()
 
-def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Če obstaja tabela obcine_po_regijah, doda stolpec 'regija' glede na 'prebivalisce'.
-    Pri tem upošteva tudi dvojezična imena občin (npr. 'Izola/Isola').
-    """
+def dodaj_obcina_id(df: pd.DataFrame) -> pd.DataFrame:
     # Preveri obstoj tabele
     cur.execute("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables 
-            WHERE table_name = 'obcine_po_regijah'
+            WHERE table_name = 'dim_obcine'
         );
     """)
     obstaja = cur.fetchone()[0]
 
     if not obstaja:
-        print("Tabela 'obcine_po_regijah' ne obstaja. Dodajam stolpec 'regija' z vrednostjo '-'.")
-        df["regija"] = "-"
+        print("Tabela 'dim_obcine' ne obstaja.")
+        df["obcina_id"] = None
         return df
 
     # Preberi občine in regije v slovar
-    cur.execute("SELECT obcina, regija FROM obcine_po_regijah;")
+    cur.execute("SELECT obcina, obcina_id FROM dim_obcine;")
     rezultati = cur.fetchall()
-    obcine_dict = {r["obcina"]: r["regija"] for r in rezultati}
+    obcine_dict = {r["obcina"]: r["obcina_id"] for r in rezultati}
 
     # Funkcija za iskanje regije, tudi za dvojezična imena
-    def najdi_regijo(prebivalisce: str) -> str:
+    def najdi_id(prebivalisce: str) -> int | None:
         kandidati = [ime.strip() for ime in prebivalisce.split("/")]
         for kandidat in kandidati:
             if kandidat in obcine_dict:
                 return obcine_dict[kandidat]
-        return "-"
+            else:
+                print(kandidat)
 
     # Uporabi funkcijo na stolpec
-    df["regija"] = df["obcina"].apply(najdi_regijo)
+    df["obcina_id"] = df["obcina"].apply(najdi_id)
 
     return df
 

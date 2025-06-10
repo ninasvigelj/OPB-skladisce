@@ -30,8 +30,9 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
     """
     cur.execute(f"""
         DROP table if exists {ime_tabele};
-        CREATE table if not exists  {ime_tabele}(            
-            obcina text primary key,
+        CREATE table if not exists  {ime_tabele}(     
+            obcina_id serial primary key,       
+            obcina text,
             regija text
         );
     """)
@@ -63,7 +64,7 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
 
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "obcine_po_regijah"
+    ime_tabele = "dim_obcine"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
