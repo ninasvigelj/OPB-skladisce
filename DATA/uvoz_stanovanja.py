@@ -29,13 +29,12 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
     cur.execute(f"""
         DROP table if exists {ime_tabele};
         CREATE table if not exists  {ime_tabele}(            
-            obcina text,
-            regija text,
+            obcina_id integer,
             leto integer,
             sobe integer,
             povrsina_m2 integer,
             stevilo integer,
-            PRIMARY KEY (obcina, leto, sobe)
+            PRIMARY KEY (obcina_id, leto, sobe)
         );
     """)
     conn.commit()
@@ -55,7 +54,12 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     cols_to_drop = [col for col in df.columns if "Stanovanja - SKUPAJ" in col]
     df = df.drop(columns=cols_to_drop)
   
-    df = df.rename(columns={"OBČINE": "obcina"}) 
+    df = df.rename(columns={"OBČINE": "obcina"})
+
+    df.loc[:, "obcina"] = df["obcina"].str.replace("Kanal", "Kanal ob Soči", regex=True)
+    df.loc[:, "obcina"] = df["obcina"].str.replace(r"Sveta Trojica v Slov\. goricah\*", "Sveta Trojica v Slov. goricah", regex=True)
+    
+
     df_long = df.melt(id_vars=["obcina", "MERITVE"], var_name="leto_sobe", value_name="vrednost")
        
     df_long[["leto", "sobe"]] = df_long["leto_sobe"].str.extract(r"(\d{4})\s+(.*)")
@@ -76,6 +80,11 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     }
     df_pivot["sobe"] = df_pivot["sobe"].map(pretvori_sobe)
 
+    #odstranimo Slovenijo, ker ni zares občina
+    df_pivot = df_pivot[df_pivot["obcina"] != "SLOVENIJA"]
+
+    df_pivot = df_pivot.dropna(subset=["povrsina_m2", "stevilo"], how="all")
+
     df_pivot["povrsina_m2"] = df_pivot["povrsina_m2"].round().astype('Int64')
     df_pivot["stevilo"] = df_pivot["stevilo"].round().astype('Int64')
     df_pivot["leto"] = df_pivot["leto"].astype(int)
@@ -91,49 +100,41 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
 
     return df_pivot
     
-
-
-def dodaj_regije(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Če obstaja tabela obcine_po_regijah, doda stolpec 'regija' glede na 'prebivalisce'.
-    Pri tem upošteva tudi dvojezična imena občin (npr. 'Izola/Isola').
-    """
+def dodaj_obcina_id(df: pd.DataFrame) -> pd.DataFrame:
     # Preveri obstoj tabele
     cur.execute("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables 
-            WHERE table_name = 'obcine_po_regijah'
+            WHERE table_name = 'dim_obcine'
         );
     """)
     obstaja = cur.fetchone()[0]
 
     if not obstaja:
-        print("Tabela 'obcine_po_regijah' ne obstaja. Dodajam stolpec 'regija' z vrednostjo '-'.")
-        df["regija"] = "-"
+        print("Tabela 'dim_obcine' ne obstaja.")
+        df["obcina_id"] = None
         return df
 
     # Preberi občine in regije v slovar
-    cur.execute("SELECT obcina, regija FROM obcine_po_regijah;")
+    cur.execute("SELECT obcina, obcina_id FROM dim_obcine;")
     rezultati = cur.fetchall()
-    obcine_dict = {r["obcina"]: r["regija"] for r in rezultati}
+    obcine_dict = {r["obcina"]: r["obcina_id"] for r in rezultati}
 
     # Funkcija za iskanje regije, tudi za dvojezična imena
-    def najdi_regijo(prebivalisce: str) -> str:
+    def najdi_id(prebivalisce: str) -> int | None:
         kandidati = [ime.strip() for ime in prebivalisce.split("/")]
         for kandidat in kandidati:
             if kandidat in obcine_dict:
                 return obcine_dict[kandidat]
-        return "-"
 
     # Uporabi funkcijo na stolpec
-    df["regija"] = df["obcina"].apply(najdi_regijo)
+    df["obcina_id"] = df["obcina"].apply(najdi_id)
 
     return df
-
-
+ 
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "stanovanja_občine"
+    ime_tabele = "fact_stanovanja_občine"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
@@ -144,8 +145,13 @@ def zapisi_df(df: pd.DataFrame) -> None:
     # Transformiramo podatke v DataFrame-u
     df = transformiraj(df)
 
-     # Dodamo pripadajoče regije
-    df = dodaj_regije(df)
+    df = dodaj_obcina_id(df)
+
+    
+    
+    if "obcina" in df.columns:
+        df = df.drop(columns=["obcina"])
+ 
 
     df = df.where(pd.notnull(df), None)
     for col in df.columns:
