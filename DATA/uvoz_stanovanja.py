@@ -134,7 +134,7 @@ def dodaj_obcina_id(df: pd.DataFrame) -> pd.DataFrame:
  
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "fact_stanovanja_občine"
+    ime_tabele = "fact_stanovanja_obcine"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
