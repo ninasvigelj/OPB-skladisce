@@ -29,10 +29,10 @@ def ustvari_tabelo(ime_tabele : str) -> None:   # da poveš pythonu kakšni tipi
     cur.execute(f"""
         DROP table if exists {ime_tabele};
         CREATE table if not exists  {ime_tabele}(            
+            regija_id integer,
             leto integer,
             BDP integer,
-            regija text,
-            PRIMARY KEY (regija, leto)
+            PRIMARY KEY (regija_id, leto)
         );
     """)
     conn.commit()
@@ -47,7 +47,7 @@ def preberi_csv(ime_datoteke : str) -> pd.DataFrame:
     return df
 
 def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
-    """Naredi tabelo s stolci leto, regija, bdp.
+    """Naredi tabelo s stolpci leto, regija, bdp.
     """
     # Omejimo se na ustrezne stolpce
     df = df.drop(columns=['MERITVE'])
@@ -59,11 +59,12 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     # Pretvorimo 
     df_trans = df.melt(id_vars="regija", var_name="leto", value_name="bdp")
 
+    df_trans = df_trans[df_trans["regija"] != "SLOVENIJA"]
     return df_trans
 
 def zapisi_df(df: pd.DataFrame) -> None:
 
-    ime_tabele = "BDP_regije"
+    ime_tabele = "fact_BDP_regije"
 
     # Poskrbimo, da tabela obstaja
     ustvari_tabelo(ime_tabele)
@@ -73,6 +74,25 @@ def zapisi_df(df: pd.DataFrame) -> None:
 
     # Transformiramo podatke v DataFrame-u
     df = transformiraj(df)
+
+    # Naloži dim_regije za mapping regija -> regija_id
+    cur.execute("SELECT regija_id, regija FROM dim_regije;")
+    regije = cur.fetchall()
+    df_regije = pd.DataFrame(regije, columns=["regija_id", "regija"])
+    
+    # Združi da dobiš regija_id
+    df = df.merge(df_regije, on="regija", how="left")
+    
+    # Preveri, če manjka kak regija
+    if df["regija_id"].isnull().any():
+        missing = df[df["regija_id"].isnull()]["regija"].unique()
+        raise ValueError(f"Nekatere regije niso bile najdene v dim_regije: {missing}")
+
+    # Odstrani ime regije, saj v bazi shranjujemo samo id
+    df = df.drop(columns=["regija"])
+
+      # Pravilno zaporedje stolpcev za vnos v bazo
+    df = df[["regija_id", "leto", "bdp"]]
     
     # shranimo stolpce v seznam
     columns = df.columns.tolist()
