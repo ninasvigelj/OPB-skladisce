@@ -1,28 +1,23 @@
 from dash import html, dcc
 
-
-def create_layout(dropdown_options, default_value):
+def create_layout_regije(dropdown_options, default_value):
     """
-    Ustvari glavno postavitev za vizualizacijo prodaje po produktnih linijah.
+    Ustvari postavitev za prikaz BDP, delovno aktivnih in stanovanj po letih za izbrano regijo.
     """
     return html.Div([
-        html.H1("Prodaja po produktnih linijah"),
+        html.H1("BDP, delovno aktivni in stanovanja po regijah"),
+
         html.Div([
-            html.Label("Izberite trgovino:"),
+            html.Label("Izberite regijo:"),
             dcc.Dropdown(
-                id="product-line-dropdown",
+                id="regija-dropdown",
                 options=dropdown_options,
                 value=default_value,
                 clearable=False
             )
-        ], style={"width": "30%", "margin-bottom": "1rem"}),
-        html.Div([
-        dcc.Graph(id="income-by-branch"),
-        dcc.Graph(id="income-by-month")
-    ], style={
-        "display": "flex",
-        "justifyContent": "flex-start",  # or 'center', 'flex-start'
-        "gap": "2rem",  # adds space between charts
-    })
-        #dcc.Graph(id="income-by-branch")
-    ])
+        ], style={"width": "40%", "margin-bottom": "1.5rem"}),
+
+        dcc.Graph(id="bdp-delovno-stanovanja")
+    ], style={"padding": "2rem"})
+
+

@@ -1,27 +1,17 @@
 from dash import Input, Output
 import plotly.express as px
-
-from Presentation.charts import stolpicni_diagram_linija, prodaja_po_mesecih
-
+from PRESENTATION.charts import graf_BDP_delovno_stanovanja_po_regiji  
 
 def register_callbacks(app, df):
     """
     Registriramo povratne klice za Dash aplikacijo.
     """
 
-    # Posodobimo prikaz prodaje glede na izbor trgovine
+    # Posodobimo graf glede na izbor regije
     @app.callback(
-        Output("income-by-branch", "figure"),
-        Input("product-line-dropdown", "value")
+        Output("bdp-delovno-stanovanja", "figure"),
+        Input("regija-dropdown", "value")
     )
-    def update_income_chart(selected_branch):
-      fig = stolpicni_diagram_linija(df, selected_branch)
-      return fig
-    
-    @app.callback(
-        Output("income-by-month", "figure"),
-        Input("product-line-dropdown", "value")
-    )
-    def update_line_chart(selected_branch):
-      fig = prodaja_po_mesecih(df, selected_branch)
-      return fig
+    def update_chart(selected_region):
+        fig = graf_BDP_delovno_stanovanja_po_regiji(df, selected_region)
+        return fig

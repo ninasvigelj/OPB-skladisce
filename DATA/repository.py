@@ -1,6 +1,7 @@
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-import auth_public as auth
+import DATA.auth_public as auth
+import datetime
 import os
 import pandas as pd
 
@@ -106,3 +107,7 @@ class Repo:
         df = pd.read_sql(query, self.conn)
         self.conn.close()
         return df
+
+repo = Repo()
+bdp = repo.bdp_delovno_stanovanja_po_regijah()
+print(bdp.head())
