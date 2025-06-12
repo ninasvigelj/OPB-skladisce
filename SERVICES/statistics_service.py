@@ -11,17 +11,17 @@ class StatisticsService:
         """
         return self.repo.bdp_po_regijah()
 
-    def st_podjetij_po_obcinah_in_regijah(self) -> pd.DataFrame:
+    def bdp_delovno_stanovanja_po_regijah(self) -> pd.DataFrame:
         """
-        Vrne število podjetij po občinah in letih.
+        Vrne združeno bdp z delovno aktivnim in stanovanji po regijah
         """
-        return self.repo.st_podjetij_po_obcinah_in_regijah()
+        return self.repo.bdp_delovno_stanovanja_po_regijah()
 
-    def delovno_aktivno_po_obcinah_in_regijah(self) -> pd.DataFrame:
+    def bdp_podjetja_delovno_po_regijah(self) -> pd.DataFrame:
         """
-        Vrne podatke o delovno aktivnem prebivalstvu po občinah in letih.
+        Vrne podatke o bdp, stevilu podjetij in delovno aktivnem prebivalstvu po regijah.
         """
-        return self.repo.delovno_aktivno_po_obcinah_in_regijah()
+        return self.repo.bdp_podjetja_delovno_po_regijah()
 
     def stanovanja_po_obcinah_in_regijah(self) -> pd.DataFrame:
         """
