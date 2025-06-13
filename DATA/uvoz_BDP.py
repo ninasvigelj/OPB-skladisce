@@ -51,6 +51,7 @@ def transformiraj(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Omejimo se na ustrezne stolpce
     df = df.drop(columns=['MERITVE'])
+    print(df)
     col = ["STATISTIČNA REGIJA"] + [f"{leto}" for leto in range(2008, 2024)]
     
     df = df[col]
@@ -114,7 +115,7 @@ def zapisi_df(df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    df = preberi_csv(r"C:\Users\laraj\OneDrive - Univerza v Ljubljani\semester 6\OPB\projektna naloga\OPB-skladisce\DATA\csv_datoteke\bdp.csv")
+    df = preberi_csv(r"C:\Users\laraj\OneDrive - Univerza v Ljubljani\semester 6\OPB\projektna naloga\OPB-skladisce\DATA\csv_datoteke\bdp_cel.csv")
 
     zapisi_df(df)
     
