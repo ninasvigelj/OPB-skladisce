@@ -7,7 +7,7 @@ from PRESENTATION.callbacks import register_callbacks
 
 # Pridobi podatke
 service = StatisticsService()
-df = service.bdp_delovno_stanovanja_po_regijah()
+df = service.vse_po_regijah()
 
 # Pripravi možnosti za dropdown
 regije = df["regija"].sort_values().unique()

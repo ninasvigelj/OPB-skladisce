@@ -5,7 +5,7 @@ def create_layout_regije(dropdown_options, default_value):
     Ustvari postavitev za prikaz BDP, delovno aktivnih in stanovanj po letih za izbrano regijo.
     """
     return html.Div([
-        html.H1("BDP, delovno aktivni in stanovanja po regijah"),
+        html.H1("Podatki po izbranih regijah"),
 
         html.Div([
             html.Label("Izberite regijo:"),
@@ -18,7 +18,7 @@ def create_layout_regije(dropdown_options, default_value):
             )
         ], style={"width": "40%", "margin-bottom": "1.5rem"}),
 
-        dcc.Graph(id="bdp-delovno-stanovanja")
+        dcc.Graph(id="bdp-delovno-stanovanja-podjetja")
     ], style={"padding": "2rem"})
 
 
