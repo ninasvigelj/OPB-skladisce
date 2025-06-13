@@ -1,30 +1,33 @@
 import plotly.express as px
 import pandas as pd
 
-def graf_BDP_delovno_stanovanja_po_regiji(df: pd.DataFrame, selected_region: str):
-    dff = df[df["regija"] == selected_region]
+def graf_BDP_delovno_stanovanja_po_regiji(df: pd.DataFrame, selected_regions: list):
+    dff = df[df["regija"].isin(selected_regions)]
 
     if dff.empty:
-        return px.line(title="Ni podatkov za izbrano regijo.")
+        return px.line(title="Ni podatkov za izbrane regije.")
 
-    # Pretvori leto v datetime (če ni že)
     dff["leto"] = pd.to_datetime(dff["leto"], format="%Y")
 
-    # Preoblikuj podatke v long (tidy) obliko, da lahko z isto X osjo prikažemo več Y-jev
-    df_long = dff.melt(
+    df_grouped = dff.groupby("leto").agg({
+        "bdp": "sum",
+        "stevilo_stanovanj": "sum",
+        "delovno_aktivno": "sum"
+    }).reset_index()
+
+    df_long = df_grouped.melt(
         id_vars=["leto"],
         value_vars=["bdp", "stevilo_stanovanj", "delovno_aktivno"],
         var_name="indikator",
         value_name="vrednost"
     )
 
-    # Nariši črte za vsak indikator posebej (različna barva)
     fig = px.line(
         df_long,
         x="leto",
         y="vrednost",
         color="indikator",
-        title=f"BDP, stanovanja in delovno aktivno prebivalstvo po letih za regijo: {selected_region}",
+        title=f"Skupno za regije: {', '.join(selected_regions)}",
         markers=True
     )
 

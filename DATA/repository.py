@@ -108,6 +108,6 @@ class Repo:
         self.conn.close()
         return df
 
-repo = Repo()
-bdp = repo.bdp_delovno_stanovanja_po_regijah()
-print(bdp.head())
+# repo = Repo()
+# bdp = repo.bdp_delovno_stanovanja_po_regijah()
+# print(bdp.head())

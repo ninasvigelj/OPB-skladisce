@@ -13,7 +13,8 @@ def create_layout_regije(dropdown_options, default_value):
                 id="regija-dropdown",
                 options=dropdown_options,
                 value=default_value,
-                clearable=False
+                multi=True,
+                clearable=True
             )
         ], style={"width": "40%", "margin-bottom": "1.5rem"}),
 
