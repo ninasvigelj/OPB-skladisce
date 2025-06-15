@@ -45,5 +45,7 @@ def create_layout_regije(dropdown_options, default_value):
 
         html.Div(id="leto-warning", style={"color": "red", "margin-bottom": "1rem"}),
 
-        dcc.Graph(id="bdp-delovno-stanovanja-podjetja")
+        dcc.Graph(id="bdp-delovno-stanovanja-podjetja"),
+        # Nov graf za stanovanja
+        dcc.Graph(id="graf-stanovanja")
     ], style={"padding": "2rem"})
