@@ -19,5 +19,5 @@ def register_callbacks(app, df, df2):
 
         fig1 = graf_vse_po_regijah(df, selected_regions, leto_od, leto_do)
         fig2 = graf_stanovanja_po_regijah(df2, selected_regions, leto_od, leto_do)
-        return fig1, fig2 ,""
+        return fig1, fig2,""
     
