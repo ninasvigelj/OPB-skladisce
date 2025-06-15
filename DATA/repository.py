@@ -29,7 +29,7 @@ class Repo:
             JOIN dim_regije r ON f.regija_id = r.regija_id
         """
         df = pd.read_sql(query, self.conn)
-        self.conn.close()
+        #self.conn.close()
         return df
     
     def stanovanja_po_obcinah_in_regijah(self) -> pd.DataFrame:
@@ -80,7 +80,7 @@ class Repo:
             LEFT JOIN stanovanja ON bdp.leto = stanovanja.leto AND bdp.regija = stanovanja.regija
         """
         df = pd.read_sql(query, self.conn)
-        self.conn.close()
+        #self.conn.close()
         return df
 
 # repo = Repo()

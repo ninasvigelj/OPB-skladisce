@@ -8,7 +8,7 @@ from PRESENTATION.callbacks import register_callbacks
 # Pridobi podatke
 service = StatisticsService()
 df = service.vse_po_regijah()
-
+df2 = service.stanovanja_po_obcinah_in_regijah()
 # Pripravi možnosti za dropdown
 regije = df["regija"].sort_values().unique()
 dropdown_options = [{"label": reg, "value": reg} for reg in regije]
@@ -25,7 +25,7 @@ app.layout = create_layout_regije(
 )
 
 # Registriraj povratne klice
-register_callbacks(app, df)
+register_callbacks(app, df, df2)
 
 # Zaženi aplikacijo
 if __name__ == "__main__":

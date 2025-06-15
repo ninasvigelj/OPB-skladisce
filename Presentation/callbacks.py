@@ -1,9 +1,10 @@
 from dash import Input, Output
 from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah
 
-def register_callbacks(app, df):
+def register_callbacks(app, df, df2):
     @app.callback(
         Output("bdp-delovno-stanovanja-podjetja", "figure"),
+        Output("graf-stanovanja", "figure"),
         Output("leto-warning", "children"),
         Input("regija-dropdown", "value"),
         Input("leto-od", "value"),
@@ -16,8 +17,7 @@ def register_callbacks(app, df):
         if leto_od > leto_do:
             return {}, "Leto 'od' ne sme biti večje od leta 'do'."
 
-        fig = graf_vse_po_regijah(df, selected_regions, leto_od, leto_do)
-        return fig, ""
+        fig1 = graf_vse_po_regijah(df, selected_regions, leto_od, leto_do)
+        fig2 = graf_stanovanja_po_regijah(df2, selected_regions, leto_od, leto_do)
+        return fig1, fig2 ,""
     
-        fig2 = graf_stanovanja_po_regijah(df, selected_regions, leto_od, leto_do)
-        return fig2, ""

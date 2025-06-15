@@ -77,10 +77,10 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_od:
     df_agg = dff.groupby(["leto_leto", "sobe"], as_index=False)["stevilo"].sum()
 
     fig = px.bar(df_agg,
-                 x="leto",
+                 x="leto_leto",
                  y="stevilo",
                  color="sobe",
-                 barmode="group",  ,
+                 barmode="group", 
                  title=f"Število stanovanj po občinah za obdobje {leto_od} do {leto_do}",
                  labels={"stevilo": "Število stanovanj", "regija": "Regija"})
 
