@@ -40,7 +40,7 @@ class Repo:
             SELECT f.leto, o.obcina, o.regija, f.sobe, f.povrsina_m2, f.stevilo
             FROM fact_stanovanja_obcine f
             JOIN dim_obcine o ON f.obcina_id = o.obcina_id
-        """
+        """ # vrne dataframe s stolpci: leto, obcina, regija, sobe, povrsina_m2, stevilo
         df = pd.read_sql(query, self.conn)
         self.conn.close()
         return df
