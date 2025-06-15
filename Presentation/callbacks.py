@@ -1,5 +1,5 @@
 from dash import Input, Output
-from PRESENTATION.charts import graf_vse_po_regijah
+from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah
 
 def register_callbacks(app, df):
     @app.callback(
@@ -18,3 +18,6 @@ def register_callbacks(app, df):
 
         fig = graf_vse_po_regijah(df, selected_regions, leto_od, leto_do)
         return fig, ""
+    
+        fig2 = graf_stanovanja_po_regijah(df, selected_regions, leto_od, leto_do)
+        return fig2, ""
