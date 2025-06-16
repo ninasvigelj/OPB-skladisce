@@ -79,5 +79,8 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
 
         dcc.Graph(id="bdp-delovno-stanovanja-podjetja"),
 
-        dcc.Graph(id="graf-stanovanja")
+        dcc.Graph(id="graf-stanovanja"),
+
+        dcc.Graph(id="graf-stanovanja-pie")
+
     ], style={"padding": "2rem"})
