@@ -21,7 +21,9 @@ app = Dash(__name__, external_stylesheets=[
 # Nastavi postavitev
 app.layout = create_layout_regije(
     dropdown_options=dropdown_options,
-    default_value=list(regije)
+    default_value=list(regije),
+    default_leva="bdp",
+    default_desna="bdp"
 )
 
 # Registriraj povratne klice
