@@ -75,6 +75,8 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_od:
     
     dff["leto_leto"] = dff["leto"].dt.year
 
+    dff["sobe"] = dff["sobe"].astype(str)
+
     # Agregira po letu in številu sob (regije se združijo)
     df_agg = dff.groupby(["leto_leto", "sobe"], as_index=False)["stevilo"].sum()
 
@@ -87,5 +89,23 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_od:
                  labels={"stevilo": "Število stanovanj", "regija": "Regija"})
 
     fig.update_layout(barmode='group', xaxis_title="Leto", yaxis_title="Število stanovanj")
+
+    return fig
+
+def graf_stanovanja_pie(df: pd.DataFrame, selected_regije: list, leto_od: int, leto_do: int):
+    dff = df[df["regija"].isin(selected_regije)].copy()
+
+    if dff.empty:
+        return go.Figure().update_layout(title="Ni podatkov za izbrane regije.")
+
+    dff["leto"] = pd.to_datetime(dff["leto"], format="%Y")
+    dff = dff[(dff["leto"].dt.year >= leto_od) & (dff["leto"].dt.year <= leto_do)]
+
+    if dff.empty:
+        return go.Figure().update_layout(title="Ni podatkov za izbrana leta.")
+
+    df_grouped = dff.groupby("sobe")["stevilo"].sum().reset_index()
+
+    fig = px.pie(df_grouped, values='stevilo', names='sobe', title='Porazdelitev stanovanj po številu sob')
 
     return fig
