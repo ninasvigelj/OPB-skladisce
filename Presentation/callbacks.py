@@ -2,12 +2,13 @@ from dash import Input, Output
 from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah
 
 from dash import Input, Output
-from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah
+from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah, graf_stanovanja_pie
 
 def register_callbacks(app, df, df2):
     @app.callback(
         Output("bdp-delovno-stanovanja-podjetja", "figure"),
         Output("graf-stanovanja", "figure"),
+        Output("graf-stanovanja-pie", "figure"),
         Output("leto-warning", "children"),
         Input("regija-dropdown", "value"),
         Input("leto-od", "value"),
@@ -24,5 +25,6 @@ def register_callbacks(app, df, df2):
 
         fig1 = graf_vse_po_regijah(df, selected_regions, leto_od, leto_do, leva_os, desna_os)
         fig2 = graf_stanovanja_po_regijah(df2, selected_regions, leto_od, leto_do)
-        return fig1, fig2, ""
+        fig3 = graf_stanovanja_pie(df2, selected_regions, leto_od, leto_do)
+        return fig1, fig2, fig3, ""
 
