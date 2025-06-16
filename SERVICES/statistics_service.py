@@ -22,3 +22,10 @@ class StatisticsService:
         Vrne podatke o stanovanjih po občinah, sobah in letih.
         """
         return self.repo.stanovanja_po_obcinah_in_regijah()
+    
+    def vse_brez_bdp_po_obcinah(self) -> pd.DataFrame:
+        """
+        Vrne podatke o številu stanovanj, številu delovno aktivnih in številu podjetij po občinah in letih.
+        """
+        return self.repo.vse_brez_bdp_po_obcinah()
+

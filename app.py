@@ -1,5 +1,7 @@
 import pandas as pd
 from dash import Dash
+import json
+import plotly.express as px
 
 from SERVICES.statistics_service import StatisticsService
 from PRESENTATION.layouts import create_layout_regije 
@@ -9,6 +11,12 @@ from PRESENTATION.callbacks import register_callbacks
 service = StatisticsService()
 df = service.vse_po_regijah()
 df2 = service.stanovanja_po_obcinah_in_regijah()
+df3 = service.vse_brez_bdp_po_obcinah()
+
+# Uvozimo json za zemljevid
+with open(r"DATA\csv_datoteke\si_obcine.json", encoding="utf-8") as f:
+    geojson_obcine = json.load(f)
+
 # Pripravi možnosti za dropdown
 regije = df["regija"].sort_values().unique()
 dropdown_options = [{"label": reg, "value": reg} for reg in regije]
