@@ -2,6 +2,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
+import json
+import os
 
 def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_od: int, leto_do: int, leva_os: str, desna_os: str):
     dff = df[df["regija"].isin(selected_regions)].copy()
@@ -107,5 +109,27 @@ def graf_stanovanja_pie(df: pd.DataFrame, selected_regije: list, leto_od: int, l
     df_grouped = dff.groupby("sobe")["stevilo"].sum().reset_index()
 
     fig = px.pie(df_grouped, values='stevilo', names='sobe', title='Porazdelitev stanovanj po številu sob')
+
+    return fig
+
+def graf_zemljevid_obcin(df: pd.DataFrame, podatek: str, leto: int, geojson_obcine: dict):
+    df_filtered = df[df["leto"] == leto]
+
+    if df_filtered.empty:
+        return go.Figure().update_layout(title="Ni podatkov za izbrano leto.")
+
+    fig = px.choropleth(
+        data_frame=df_filtered,
+        geojson=geojson_obcine,
+        locations="obcina",
+        featureidkey="properties.name",
+        color=podatek,
+        projection="mercator",
+        title=f"{podatek.replace('_', ' ').capitalize()} po občinah ({leto})",
+        color_continuous_scale="Plasma_r" # same hude barve: https://plotly.com/python/builtin-colorscales/
+    )
+    fig.update_geos(fitbounds="locations", visible=False)
+
+    fig.update_layout(margin={"r":0,"t":30,"l":0,"b":0})
 
     return fig

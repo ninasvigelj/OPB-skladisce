@@ -13,6 +13,7 @@ df = service.vse_po_regijah()
 df2 = service.stanovanja_po_obcinah_in_regijah()
 df3 = service.vse_brez_bdp_po_obcinah()
 
+
 # Uvozimo json za zemljevid
 with open(r"DATA\csv_datoteke\si_obcine.json", encoding="utf-8") as f:
     geojson_obcine = json.load(f)
@@ -35,7 +36,7 @@ app.layout = create_layout_regije(
 )
 
 # Registriraj povratne klice
-register_callbacks(app, df, df2)
+register_callbacks(app, df, df2, df3, geojson_obcine)
 
 # Zaženi aplikacijo
 if __name__ == "__main__":

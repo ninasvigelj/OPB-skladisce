@@ -81,6 +81,32 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
 
         dcc.Graph(id="graf-stanovanja"),
 
-        dcc.Graph(id="graf-stanovanja-pie")
+        dcc.Graph(id="graf-stanovanja-pie"),
+
+        html.Div([
+            html.H4("Izberi podatek in leto za zemljevid občin:"),
+            
+            dcc.Dropdown(
+                id="izberi-podatek",
+                options=[
+                    {"label": "Delovno aktivni", "value": "delovno_aktivno"},
+                    {"label": "Podjetja", "value": "stevilo_podjetij"},
+                    {"label": "Stanovanja", "value": "stevilo_stanovanj"}
+                ],
+                value="delovno_aktivno",
+                clearable=False,
+                style={"margin-bottom": "10px"}
+            ),
+
+            dcc.Dropdown(
+                id="izberi-leto-zemljevid",
+                options=[{"label": str(leto), "value": leto} for leto in range(2008, 2024)],
+                value=2023,
+                clearable=False,
+                style={"margin-bottom": "30px"}
+            ),
+
+            dcc.Graph(id="zemljevid-obcin", style={"height": "600px"})
+        ])
 
     ], style={"padding": "2rem"})

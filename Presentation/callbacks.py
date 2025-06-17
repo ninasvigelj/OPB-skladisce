@@ -1,10 +1,7 @@
 from dash import Input, Output
-from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah
+from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah, graf_stanovanja_pie, graf_zemljevid_obcin
 
-from dash import Input, Output
-from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah, graf_stanovanja_pie
-
-def register_callbacks(app, df, df2):
+def register_callbacks(app, df, df2, df3, geojson_obcine):
     @app.callback(
         Output("bdp-delovno-stanovanja-podjetja", "figure"),
         Output("graf-stanovanja", "figure"),
@@ -27,4 +24,14 @@ def register_callbacks(app, df, df2):
         fig2 = graf_stanovanja_po_regijah(df2, selected_regions, leto_od, leto_do)
         fig3 = graf_stanovanja_pie(df2, selected_regions, leto_od, leto_do)
         return fig1, fig2, fig3, ""
+    
+    @app.callback(
+        Output("zemljevid-obcin", "figure"),
+        Input("izberi-podatek", "value"),
+        Input("izberi-leto-zemljevid", "value")
+    )
+    def update_map(podatek, leto):
+        return graf_zemljevid_obcin(df3, podatek, leto, geojson_obcine)
+
+
 
