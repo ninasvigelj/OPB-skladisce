@@ -55,7 +55,8 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
                 ],
                 value=default_leva,
                 placeholder="Izberite podatke:",
-                style={"width": "200px"}
+                style={"width": "200px"},
+                clearable=False
             )
         ], style={"display": "inline-block", "margin-right": "30px"}),
 
@@ -71,7 +72,8 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
                 ],
                 value=default_desna,
                 placeholder="Izberite podatke:",
-                style={"width": "200px"}
+                style={"width": "200px"},
+                clearable=False
             )
         ], style={"display": "inline-block"}),
 
