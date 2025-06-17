@@ -84,7 +84,7 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
         dcc.Graph(id="graf-stanovanja-pie"),
 
         html.Div([
-            html.H4("Izberi podatek in leto za zemljevid občin:"),
+            html.Label("Izberi podatek in leto za zemljevid občin:"),
             
             dcc.Dropdown(
                 id="izberi-podatek",
