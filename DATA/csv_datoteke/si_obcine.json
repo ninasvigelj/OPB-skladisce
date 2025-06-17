@@ -2321,7 +2321,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI044", 
-        "name": "Kanal"
+        "name": "Kanal ob Soči"
       }, 
       "id": 14
     }, 
@@ -2853,7 +2853,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI084", 
-        "name": "Nova Goriška"
+        "name": "Nova Gorica"
       }, 
       "id": 16
     }, 
@@ -2973,7 +2973,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI183", 
-        "name": "Šempeter-Vrtojba"
+        "name": "Šempeter - Vrtojba"
       }, 
       "id": 17
     }, 
@@ -3085,7 +3085,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI075", 
-        "name": "Miren-Kostanjevica"
+        "name": "Miren - Kostanjevica"
       }, 
       "id": 18
     }, 
@@ -3585,7 +3585,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI035", 
-        "name": "Hrpelje-Kozina"
+        "name": "Hrpelje - Kozina"
       }, 
       "id": 21
     }, 
@@ -4013,7 +4013,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI195", 
-        "name": "Apace"
+        "name": "Apače"
       }, 
       "id": 25
     }, 
@@ -6453,7 +6453,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI180", 
-        "name": "Solcava"
+        "name": "Solčava"
       }, 
       "id": 41
     }, 
@@ -7265,7 +7265,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI143", 
-        "name": "Zavrc"
+        "name": "Zavrč"
       }, 
       "id": 47
     }, 
@@ -8349,7 +8349,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI092", 
-        "name": "Podcetrtek"
+        "name": "Podčetrtek"
       }, 
       "id": 55
     }, 
@@ -9719,7 +9719,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI017", 
-        "name": "Crnomelj"
+        "name": "Črnomelj"
       }, 
       "id": 61
     }, 
@@ -10107,7 +10107,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI048", 
-        "name": "Kocevje"
+        "name": "Kočevje"
       }, 
       "id": 62
     }, 
@@ -11455,7 +11455,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI160", 
-        "name": "Hoce-Slivnica"
+        "name": "Hoče - Slivnica"
       }, 
       "id": 71
     }, 
@@ -14807,7 +14807,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI067", 
-        "name": "Luce"
+        "name": "Luče"
       }, 
       "id": 91
     }, 
@@ -16691,7 +16691,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI182", 
-        "name": "Sveti Andraž v Slovenskih Goricah"
+        "name": "Sveti Andraž v Slov. goricah"
       }, 
       "id": 107
     }, 
@@ -17071,7 +17071,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI021", 
-        "name": "Dobrova-Polhov Gradec"
+        "name": "Dobrova - Polhov Gradec"
       }, 
       "id": 109
     }, 
@@ -17255,7 +17255,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI027", 
-        "name": "Gorenja vas-Poljane"
+        "name": "Gorenja vas - Poljane"
       }, 
       "id": 110
     }, 
@@ -17739,7 +17739,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI098", 
-        "name": "Race-Fram"
+        "name": "Rače - Fram"
       }, 
       "id": 114
     }, 
@@ -18855,7 +18855,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI144", 
-        "name": "Zrece"
+        "name": "Zreče"
       }, 
       "id": 123
     }, 
@@ -21307,7 +21307,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI039", 
-        "name": "Ivancna Gorica"
+        "name": "Ivančna Gorica"
       }, 
       "id": 137
     }, 
@@ -21815,7 +21815,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI194", 
-        "name": "Šmartno in Litiji"
+        "name": "Šmartno pri Litiji"
       }, 
       "id": 139
     }, 
@@ -22291,7 +22291,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI077", 
-        "name": "Moravce"
+        "name": "Moravče"
       }, 
       "id": 143
     }, 
@@ -22551,7 +22551,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI099", 
-        "name": "Radece"
+        "name": "Radeče"
       }, 
       "id": 145
     }, 
@@ -23799,7 +23799,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI019", 
-        "name": "Divaca"
+        "name": "Divača"
       }, 
       "id": 153
     }, 
@@ -24775,7 +24775,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI120", 
-        "name": "Šentjur pri Celju"
+        "name": "Šentjur"
       }, 
       "id": 157
     }, 
@@ -25635,7 +25635,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI170", 
-        "name": "Mirna Pec"
+        "name": "Mirna Peč"
       }, 
       "id": 161
     }, 
@@ -25803,7 +25803,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI199", 
-        "name": "Mokronog-Trebelno"
+        "name": "Mokronog - Trebelno"
       }, 
       "id": 162
     }, 
@@ -26319,7 +26319,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI116", 
-        "name": "Sveti Jurij"
+        "name": "Sveti Jurij ob Ščavnici"
       }, 
       "id": 166
     }, 
@@ -27691,7 +27691,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI151", 
-        "name": "Braslovce"
+        "name": "Braslovče"
       }, 
       "id": 176
     }, 
@@ -28471,7 +28471,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI045", 
-        "name": "Kidricevo"
+        "name": "Kidričevo"
       }, 
       "id": 183
     }, 
@@ -28991,7 +28991,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI109", 
-        "name": "Semic"
+        "name": "Semič"
       }, 
       "id": 187
     }, 
@@ -30067,7 +30067,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI197", 
-        "name": "Kostanjevica"
+        "name": "Kostanjevica na Krki"
       }, 
       "id": 194
     }, 
@@ -30839,7 +30839,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI201", 
-        "name": "Renče-Vogrsko"
+        "name": "Renče - Vogrsko"
       }, 
       "id": 198
     }, 
@@ -31439,7 +31439,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI085", 
-        "name": "Novo Mesto"
+        "name": "Novo mesto"
       }, 
       "id": 200
     }, 
@@ -31611,7 +31611,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI204", 
-        "name": "Sveta Trojica v Slovenskih goricah"
+        "name": "Sveta Trojica v Slov. goricah"
       }, 
       "id": 201
     }, 
@@ -32115,7 +32115,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI208", 
-        "name": "Log-Dragomer"
+        "name": "Log - Dragomer"
       }, 
       "id": 205
     }, 
@@ -32395,7 +32395,7 @@
       "properties": {
         "source": "https://simplemaps.com", 
         "id": "SI210", 
-        "name": "Sveti Jurij v Slovenskih goricah"
+        "name": "Sveti Jurij v Slov. goricah"
       }, 
       "id": 207
     }, 

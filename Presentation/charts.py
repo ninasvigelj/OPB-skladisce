@@ -41,7 +41,7 @@ def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_od: int, 
     # Poimenujmo osi
     imena_osi = {
         "bdp": "BDP (mio EUR)",
-        "stevilo_stanovanj": "Število stanovanj",
+        "stevilo_stanovanj": "Število dokončanih stanovanj",
         "stevilo_podjetij": "Število podjetij",
         "delovno_aktivno": "Delovno aktivno prebivalstvo"
     }
