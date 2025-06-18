@@ -3,9 +3,9 @@ from dash import Dash
 import json
 import plotly.express as px
 
-from SERVICES.statistics_service import StatisticsService
-from PRESENTATION.layouts import create_layout_regije 
-from PRESENTATION.callbacks import register_callbacks
+from Services.statistics_service import StatisticsService
+from Presentation.layouts import create_layout_regije 
+from Presentation.callbacks import register_callbacks
 
 # Pridobi podatke
 service = StatisticsService()

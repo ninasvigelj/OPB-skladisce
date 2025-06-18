@@ -1,4 +1,4 @@
-from DATA.repository import Repo
+from Data.repository import Repo
 import pandas as pd
 
 class StatisticsService:

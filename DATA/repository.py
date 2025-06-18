@@ -1,6 +1,6 @@
 import psycopg2, psycopg2.extensions, psycopg2.extras
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-import DATA.auth_public as auth
+import Data.auth_public as auth
 import datetime
 import os
 import pandas as pd

@@ -1,5 +1,5 @@
 from dash import Input, Output
-from PRESENTATION.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah, graf_stanovanja_pie, graf_zemljevid_obcin
+from Presentation.charts import graf_vse_po_regijah, graf_stanovanja_po_regijah, graf_stanovanja_pie, graf_zemljevid_obcin
 
 def register_callbacks(app, df, df2, df3, geojson_obcine):
     @app.callback(
