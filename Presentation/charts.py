@@ -5,7 +5,9 @@ import pandas as pd
 import json
 import os
 
-def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_od: int, leto_do: int, leva_os: str, desna_os: str):
+def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_obdobje: list, leva_os: str, desna_os: str):
+    leto_od, leto_do = leto_obdobje
+
     dff = df[df["regija"].isin(selected_regions)].copy()
 
     if dff.empty:
@@ -63,7 +65,10 @@ def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_od: int, 
     return fig
 
 
-def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_od: int, leto_do: int):
+
+def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_obdobje: list):
+    leto_od, leto_do = leto_obdobje
+
     dff = df[df["regija"].isin(selected_regije)].copy()
 
     if dff.empty:
@@ -94,7 +99,8 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_od:
 
     return fig
 
-def graf_stanovanja_pie(df: pd.DataFrame, selected_regije: list, leto_od: int, leto_do: int):
+def graf_stanovanja_pie(df: pd.DataFrame, selected_regije: list, leto_obdobje: list):
+    leto_od, leto_do = leto_obdobje
     dff = df[df["regija"].isin(selected_regije)].copy()
 
     if dff.empty:

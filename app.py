@@ -14,7 +14,7 @@ df2 = service.stanovanja_po_obcinah_in_regijah()
 df3 = service.vse_brez_bdp_po_obcinah()
 
 
-# Uvozimo json za zemljevid
+# Uvozimo json za zemljevid (VIR: https://simplemaps.com/gis/country/si)
 with open(r"DATA\csv_datoteke\si_obcine.json", encoding="utf-8") as f:
     geojson_obcine = json.load(f)
 

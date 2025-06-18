@@ -16,32 +16,18 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
         ], style={"width": "40%", "margin-bottom": "1rem"}),
 
         html.Div([
-            html.Div([
-                html.Label("Leto od: "),
-                dcc.Input(
-                    id="leto-od",
-                    type="number",
-                    min=2008,
-                    max=2023,
-                    step=1,
-                    value=2008,
-                    style={"width": "100px"}
-                )
-            ], style={"margin-right": "1.5rem"}),
-
-            html.Div([
-                html.Label("Leto do: "),
-                dcc.Input(
-                    id="leto-do",
-                    type="number",
-                    min=2008,
-                    max=2023,
-                    step=1,
-                    value=2023,
-                    style={"width": "100px"}
-                )
-            ])
-        ], style={"display": "flex", "margin-bottom": "1.5rem"}),
+            html.Label("Izberi obdobje:"),
+            dcc.RangeSlider(
+                id="leto-obdobje",
+                min=2008,
+                max=2023,
+                step=1,
+                value=[2008, 2023],
+                marks={leto: str(leto) for leto in range(2008, 2024)},
+                tooltip={"placement": "bottom", "always_visible": True},
+                allowCross=False
+            )
+        ], style={"margin-bottom": "1.5rem"}),
 
         html.Div([
             html.Label("Leva os:", style={"margin-right": "10px"}),

@@ -8,21 +8,23 @@ def register_callbacks(app, df, df2, df3, geojson_obcine):
         Output("graf-stanovanja-pie", "figure"),
         Output("leto-warning", "children"),
         Input("regija-dropdown", "value"),
-        Input("leto-od", "value"),
-        Input("leto-do", "value"),
+        Input("leto-obdobje", "value"),
         Input("leva-os-dropdown", "value"),
         Input("desna-os-dropdown", "value")
     )
-    def update_chart(selected_regions, leto_od, leto_do, leva_os, desna_os):
-        if not selected_regions or leto_od is None or leto_do is None:
-            return {}, {}, "Prosimo, izpolnite vsa polja in pri tem pazite, da izberete obdobje med 2008 in 2023."
+    def update_chart(selected_regions, leto_obdobje, leva_os, desna_os):
+        if not selected_regions or leto_obdobje is None:
+            return {}, {}, {}, "Prosimo, izpolnite vsa polja in pri tem pazite, da izberete obdobje med 2008 in 2023."
+
+        leto_od, leto_do = leto_obdobje
 
         if leto_od > leto_do:
-            return {}, {}, "Leto 'od' ne sme biti večje od leta 'do'."
+            return {}, {}, {}, "Leto 'od' ne sme biti večje od leta 'do'."
 
-        fig1 = graf_vse_po_regijah(df, selected_regions, leto_od, leto_do, leva_os, desna_os)
-        fig2 = graf_stanovanja_po_regijah(df2, selected_regions, leto_od, leto_do)
-        fig3 = graf_stanovanja_pie(df2, selected_regions, leto_od, leto_do)
+        fig1 = graf_vse_po_regijah(df, selected_regions, leto_obdobje, leva_os, desna_os)
+        fig2 = graf_stanovanja_po_regijah(df2, selected_regions, leto_obdobje)
+        fig3 = graf_stanovanja_pie(df2, selected_regions, leto_obdobje)
+
         return fig1, fig2, fig3, ""
     
     @app.callback(
