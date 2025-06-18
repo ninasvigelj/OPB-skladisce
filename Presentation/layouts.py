@@ -35,13 +35,13 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
                 id="leva-os-dropdown",
                 options=[
                     {"label": "BDP", "value": "bdp"},
-                    {"label": "Število stanovanj", "value": "stevilo_stanovanj"},
+                    {"label": "Število dokončanih stanovanj", "value": "stevilo_stanovanj"},
                     {"label": "Število podjetij", "value": "stevilo_podjetij"},
                     {"label": "Delovno aktivno prebivalstvo", "value": "delovno_aktivno"},
                 ],
                 value=default_leva,
                 placeholder="Izberite podatke:",
-                style={"width": "200px"},
+                style={"width": "250px"},
                 clearable=False
             )
         ], style={"display": "inline-block", "margin-right": "30px"}),
@@ -52,13 +52,13 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
                 id="desna-os-dropdown",
                 options=[
                     {"label": "BDP", "value": "bdp"},
-                    {"label": "Število stanovanj", "value": "stevilo_stanovanj"},
+                    {"label": "Število dokončanih stanovanj", "value": "stevilo_stanovanj"},
                     {"label": "Število podjetij", "value": "stevilo_podjetij"},
                     {"label": "Delovno aktivno prebivalstvo", "value": "delovno_aktivno"},
                 ],
                 value=default_desna,
                 placeholder="Izberite podatke:",
-                style={"width": "200px"},
+                style={"width": "250px"},
                 clearable=False
             )
         ], style={"display": "inline-block"}),
@@ -77,9 +77,9 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
             dcc.Dropdown(
                 id="izberi-podatek",
                 options=[
-                    {"label": "Delovno aktivni", "value": "delovno_aktivno"},
-                    {"label": "Podjetja", "value": "stevilo_podjetij"},
-                    {"label": "Stanovanja", "value": "stevilo_stanovanj"}
+                    {"label": "Delovno aktivno prebivalstvo", "value": "delovno_aktivno"},
+                    {"label": "Število podjetij", "value": "stevilo_podjetij"},
+                    {"label": "Število dokončanih stanovanj", "value": "stevilo_stanovanj"}
                 ],
                 value="delovno_aktivno",
                 clearable=False,

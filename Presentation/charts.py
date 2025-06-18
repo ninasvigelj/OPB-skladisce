@@ -57,7 +57,14 @@ def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_obdobje: 
         title=f"Podatki za izbrane regije za obdobje {leto_od} do {leto_do}",
         xaxis_title="Leto",
         yaxis_title=yaxis_title_leva,
-        margin={"t": 40, "l": 40, "r": 20, "b": 30}
+        margin={"t": 40, "l": 40, "r": 20, "b": 30},
+        plot_bgcolor="#ffffff",
+        xaxis=dict(
+            gridcolor="#e0e0e0"
+        ),
+        yaxis=dict(
+            gridcolor="#e0e0e0"
+        )
     )
 
     fig.update_yaxes(title_text=yaxis_title_desna, secondary_y=True)
@@ -88,14 +95,22 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_obd
     df_agg = dff.groupby(["leto_leto", "sobe"], as_index=False)["stevilo"].sum()
 
     fig = px.bar(df_agg,
-                 x="leto_leto",
-                 y="stevilo",
-                 color="sobe",
-                 barmode="group", 
-                 title=f"Število stanovanj po občinah za obdobje {leto_od} do {leto_do}",
-                 labels={"stevilo": "Število stanovanj", "regija": "Regija"})
+                x="leto_leto",
+                y="stevilo",
+                color="sobe",
+                barmode="group", 
+                title=f"Število stanovanj po občinah za obdobje {leto_od} do {leto_do}",
+                labels={"stevilo": "Število stanovanj", "regija": "Regija"})
 
-    fig.update_layout(barmode='group', xaxis_title="Leto", yaxis_title="Število stanovanj")
+    fig.update_layout(
+        barmode='group', 
+        xaxis_title="Leto", 
+        yaxis_title="Število stanovanj",
+        plot_bgcolor="#ffffff",
+        yaxis=dict(
+            gridcolor="#e0e0e0"
+        )
+    )
 
     return fig
 
@@ -124,6 +139,12 @@ def graf_zemljevid_obcin(df: pd.DataFrame, podatek: str, leto: int, geojson_obci
     if df_filtered.empty:
         return go.Figure().update_layout(title="Ni podatkov za izbrano leto.")
 
+    moznosti_za_title = {
+        "stevilo_stanovanj": "Število dokončanih stanovanj",
+        "stevilo_podjetij": "Število podjetij",
+        "delovno_aktivno": "Število delovno aktivnih prebivalcev (glede na prebivališče)"
+    }
+
     fig = px.choropleth(
         data_frame=df_filtered,
         geojson=geojson_obcine,
@@ -131,7 +152,7 @@ def graf_zemljevid_obcin(df: pd.DataFrame, podatek: str, leto: int, geojson_obci
         featureidkey="properties.name",
         color=podatek,
         projection="mercator",
-        title=f"{podatek.replace('_', ' ').capitalize()} po občinah ({leto})",
+        title=f"{moznosti_za_title.get(podatek, podatek.replace('_', ' ').capitalize())} po občinah ({leto})",
         color_continuous_scale="Plasma_r" # same hude barve: https://plotly.com/python/builtin-colorscales/
     )
     fig.update_geos(fitbounds="locations", visible=False)
