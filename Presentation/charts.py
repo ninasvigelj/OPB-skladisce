@@ -54,7 +54,7 @@ def graf_vse_po_regijah(df: pd.DataFrame, selected_regions: list, leto_obdobje: 
     yaxis_title_desna = imena_osi.get(desna_os, desna_os.replace("_", " ").title())
 
     fig.update_layout(
-        title=f"Podatki za izbrane regije za obdobje {leto_od} do {leto_do}",
+        title=f"Podatki za izbrane parametre za obdobje {leto_od} do {leto_do}",
         xaxis_title="Leto",
         yaxis_title=yaxis_title_leva,
         margin={"t": 40, "l": 40, "r": 20, "b": 30},
