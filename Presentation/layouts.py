@@ -66,10 +66,28 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
         html.Div(id="leto-warning", style={"color": "red", "margin-bottom": "1rem"}),
 
         dcc.Graph(id="bdp-delovno-stanovanja-podjetja"),
+        html.P("Graf prikazuje podatke izbranih regij skozi čas za različne indikatorje (npr. BDP, število podjetij, itd.).", style={"margin-bottom": "2rem"}),
 
-        dcc.Graph(id="graf-stanovanja"),
+        html.Hr(style={"margin": "2rem 0"}),
 
-        dcc.Graph(id="graf-stanovanja-pie"),
+        html.H2("Število dokončanih stanovanj po regijah in izbranih letih po številu sob"),
+
+        html.Div([
+            html.Div([
+                dcc.Graph(id="graf-stanovanja")
+            ], style={"width": "70%", "padding-right": "1rem"}),
+
+            html.Div([
+                dcc.Graph(id="graf-stanovanja-pie")
+            ], style={"width": "30%"})
+        ], style={"display": "flex", "margin-bottom": "2rem"}),
+
+        html.P("Graf prikazuje podatke izbranih regij skozi čas za različne indikatorje (npr. BDP, število podjetij, itd.).", style={"margin-bottom": "2rem"}),
+
+        html.Hr(style={"margin": "2rem 0"}),
+
+        html.H2("Prikaz podatkov za izbrane parametre po občinah"),
+
 
         html.Div([
             html.Label("Izberi podatek in leto za zemljevid občin:"),
@@ -94,7 +112,9 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
                 style={"margin-bottom": "30px"}
             ),
 
-            dcc.Graph(id="zemljevid-obcin", style={"height": "600px"})
+            dcc.Graph(id="zemljevid-obcin", style={"height": "600px"}),
+            html.P("Graf prikazuje podatke izbranih regij skozi čas za različne indikatorje (npr. BDP, število podjetij, itd.).", style={"margin-bottom": "2rem"})
+
         ])
 
     ], style={"padding": "2rem"})
