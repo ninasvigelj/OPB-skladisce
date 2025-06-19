@@ -99,7 +99,7 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_obd
                 y="stevilo",
                 color="sobe",
                 barmode="group", 
-                title=f"Število stanovanj po občinah za obdobje {leto_od} do {leto_do}",
+                title=f"Število stanovanj po izbranih regijah za obdobje {leto_od} do {leto_do}",
                 labels={"stevilo": "Število stanovanj", "regija": "Regija"})
 
     fig.update_layout(
