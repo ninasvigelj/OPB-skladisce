@@ -93,6 +93,8 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_obd
 
     # Agregira po letu in številu sob (regije se združijo)
     df_agg = dff.groupby(["leto_leto", "sobe"], as_index=False)["stevilo"].sum()
+    df_agg = df_agg.sort_values("sobe", ascending=False)
+
 
     fig = px.bar(df_agg,
                 x="leto_leto",
@@ -112,6 +114,8 @@ def graf_stanovanja_po_regijah(df: pd.DataFrame, selected_regije: list, leto_obd
         )
     )
 
+    fig.update_layout(legend_title_text="Število sob")
+
     return fig
 
 def graf_stanovanja_pie(df: pd.DataFrame, selected_regije: list, leto_obdobje: list):
@@ -129,7 +133,10 @@ def graf_stanovanja_pie(df: pd.DataFrame, selected_regije: list, leto_obdobje: l
 
     df_grouped = dff.groupby("sobe")["stevilo"].sum().reset_index()
 
-    fig = px.pie(df_grouped, values='stevilo', names='sobe', title='Porazdelitev stanovanj po številu sob')
+    fig = px.pie(df_grouped, values='stevilo', names='sobe', 
+                 title='Porazdelitev stanovanj po številu sob')
+    
+    fig.update_layout(legend_title_text="Število sob")
 
     return fig
 
