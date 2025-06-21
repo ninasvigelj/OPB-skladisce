@@ -66,7 +66,10 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
         html.Div(id="leto-warning", style={"color": "red", "margin-bottom": "1rem"}),
 
         dcc.Graph(id="bdp-delovno-stanovanja-podjetja"),
-        html.P("Graf prikazuje podatke izbranih regij skozi čas za različne indikatorje (npr. BDP, število podjetij, itd.).", style={"margin-bottom": "2rem"}),
+        html.P("Graf prikazuje podatke izbranih regij (če imamo izranih več regij, graf prikazuje vsoto določene količine za vse izbrane regije)" \
+        " skozi čas (izbrano obdobje) za izbrane indikatorje (npr. BDP, število podjetij, itd.). Na grafu lahko za izbrano obdobje opazujemo, kako so se gibali izbrani podatki.Pri analizi s pomočjo tega grafa moramo "
+        "biti pozorni na to katere podatke smo izbrali na levi in katere na desni osi in da te dve ne prikazujeta nujno primerljivih številk."
+        , style={"margin-bottom": "2rem"}),
 
         html.Hr(style={"margin": "2rem 0"}),
 
@@ -82,7 +85,9 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
             ], style={"width": "30%"})
         ], style={"display": "flex", "margin-bottom": "2rem"}),
 
-        html.P("Graf prikazuje podatke izbranih regij skozi čas za različne indikatorje (npr. BDP, število podjetij, itd.).", style={"margin-bottom": "2rem"}),
+        html.P("Levi graf prikazuje podatke o številu dokončanih stanovanj v izbranih regijah po posameznih letih v izbranem obdobju. Desni graf pa nam prikazuje kako" \
+        " so vsa dokočana stanovanja v določenem odbobju (gledamo torej vsoto po letih) razdeljena glede na število sob oziroma kolikšen del dokončanih stanovanj ima določeno število sob." \
+        "Podatki v obeh grafih se seštevajo glede na izbrane regije.", style={"margin-bottom": "2rem"}),
 
         html.Hr(style={"margin": "2rem 0"}),
 
