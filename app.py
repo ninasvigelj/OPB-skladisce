@@ -15,7 +15,7 @@ df3 = service.vse_brez_bdp_po_obcinah()
 
 
 # Uvozimo json za zemljevid (VIR: https://simplemaps.com/gis/country/si)
-with open(r"DATA\csv_datoteke\si_obcine.json", encoding="utf-8") as f:
+with open(r"Data\csv_datoteke\si_obcine.json", encoding="utf-8") as f:
     geojson_obcine = json.load(f)
 
 # Pripravi možnosti za dropdown
