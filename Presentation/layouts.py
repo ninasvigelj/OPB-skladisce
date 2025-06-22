@@ -118,10 +118,11 @@ def create_layout_regije(dropdown_options, default_value, default_leva, default_
             ),
 
             dcc.Graph(id="zemljevid-obcin", style={"height": "600px"}),
-            html.P("Graf prikazuje izbrane podatke po občinah za izbrani leto." \
-            " Na levi strani lahko vidimo barvno lestvico ki prikazuje vrednosti izbranega indikatorja." \
-            " Opomba*: občina Mirna obstaja od leta 2009, občina Ankaran pa od leta 2015 naprej, zato so zemljevidi" \
-            " v teh letih zemljevidi malo drugačni. ", style={"margin-bottom": "2rem"})
+            html.P([
+                "Graf prikazuje izbrane podatke po občinah za izbrani leto. Na levi strani lahko vidimo barvno lestvico ki prikazuje vrednosti izbranega indikatorja. ",
+                html.Br(),
+                html.I("Opomba: občina Mirna obstaja od leta 2009, občina Ankaran pa od leta 2015 naprej, zato so zemljevidi v teh letih zemljevidi malo drugačni.")
+            ], style={"margin-bottom": "2rem"})
 
         ])
 
